@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#060608">
+    <meta name="description" content="AryaX — The World's First Artificial Human Mind. Chat, Code, Create, Analyze and more.">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='22' fill='%230a0a0a'/%3E%3Cpath fill-rule='evenodd' d='M50,16 L15,84 H32 L39,63 H61 L68,84 H85 L50,16 Z M44,55 L50,30 L56,55 Z' fill='white'/%3E%3C/svg%3E">
+    <title>AryaX — Artificial Super Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <link rel="stylesheet" href="style.css?v=4.3">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  INTRO SCREEN                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="introScreen" class="intro-screen">
+    <div class="intro-bg-glow"></div>
+    <div class="intro-content">
+        <div class="intro-logo-wrap">
+            <svg width="88" height="88" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="22" fill="rgba(255,255,255,0.08)"/>
+                <path fill-rule="evenodd" class="ipath"
+                    d="M50,16 L15,84 H32 L39,63 H61 L68,84 H85 L50,16 Z M44,55 L50,30 L56,55 Z"
+                    fill="white" stroke="none"/>
+            </svg>
+        </div>
+        <div class="intro-brand">AryaX</div>
+        <div class="intro-sub">Artificial Super Intelligence</div>
+        <div class="intro-bar"><div class="intro-bar-fill"></div></div>
+        <div class="intro-status" id="introStatus">🚀 Initializing Neural Core...</div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  ONBOARDING POPUP (shows after intro, before login) -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="onboardingModal" class="onboarding-overlay" style="display:none;">
+    <div class="onboarding-card">
+        <div class="onboarding-header">
+            <div class="ob-logo">
+                <svg width="34" height="34" viewBox="0 0 100 100" fill="none">
+                    <rect width="100" height="100" rx="18" fill="#fff"/>
+                    <path fill-rule="evenodd" d="M50,16 L15,84 H32 L39,63 H61 L68,84 H85 L50,16 Z M44,55 L50,30 L56,55 Z" fill="#000"/>
+                </svg>
+                <span>AryaX</span>
+            </div>
+            <button id="closeOnboarding" class="ob-skip">Skip →</button>
+        </div>
+
+        <h2 class="ob-title">Meet your AI mind</h2>
+        <p class="ob-desc">AryaX is not just a chatbot. It is a full-stack intelligence platform built for creators, developers, and businesses.</p>
+
+        <div class="ob-features">
+            <div class="ob-feature">
+                <div class="ob-icon">💬</div>
+                <div>
+                    <div class="ob-feat-title">Smart Chat</div>
+                    <div class="ob-feat-desc">Ask anything — get expert-level answers instantly</div>
+                </div>
+            </div>
+            <div class="ob-feature">
+                <div class="ob-icon">⚡</div>
+                <div>
+                    <div class="ob-feat-title">Live Code Sandbox</div>
+                    <div class="ob-feat-desc">Write & run Python code right inside the chat</div>
+                </div>
+            </div>
+            <div class="ob-feature">
+                <div class="ob-icon">🎨</div>
+                <div>
+                    <div class="ob-feat-title">Image Generation</div>
+                    <div class="ob-feat-desc">Create photorealistic images from text prompts</div>
+                </div>
+            </div>
+            <div class="ob-feature">
+                <div class="ob-icon">🌐</div>
+                <div>
+                    <div class="ob-feat-title">Live Web Search</div>
+                    <div class="ob-feat-desc">Real-time internet search built into every response</div>
+                </div>
+            </div>
+            <div class="ob-feature">
+                <div class="ob-icon">📄</div>
+                <div>
+                    <div class="ob-feat-title">Document Creator</div>
+                    <div class="ob-feat-desc">Generate PDFs, Excel sheets, presentations & more</div>
+                </div>
+            </div>
+            <div class="ob-feature">
+                <div class="ob-icon">🔒</div>
+                <div>
+                    <div class="ob-feat-title">Ethical Cyber AI</div>
+                    <div class="ob-feat-desc">Security analysis and ethical hacking guidance</div>
+                </div>
+            </div>
+        </div>
+
+        <button id="getStartedBtn" class="ob-cta">Get Started Free →</button>
+        <p class="ob-legal">No credit card required · Free forever · 10,000 credits/day</p>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  AUTH OVERLAY                                   -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="authOverlay" class="auth-overlay" style="display:none;">
+    <div class="auth-left">
+        <div class="auth-brand">
+            <svg width="38" height="38" viewBox="0 0 100 100" fill="none">
+                <rect width="100" height="100" rx="18" fill="#fff"/>
+                <path fill-rule="evenodd" d="M50,16 L15,84 H32 L39,63 H61 L68,84 H85 L50,16 Z M44,55 L50,30 L56,55 Z" fill="#000"/>
+            </svg>
+            <span>AryaX</span>
+        </div>
+        <div class="auth-left-content">
+            <h1>The future of intelligence is here.</h1>
+            <p>10,000+ queries answered daily. Join the next generation of AI users.</p>
+            <div class="auth-stats">
+                <div class="auth-stat"><span class="stat-num">50K+</span><span class="stat-label">Users</span></div>
+                <div class="auth-stat"><span class="stat-num">2M+</span><span class="stat-label">Queries</span></div>
+                <div class="auth-stat"><span class="stat-num">99.9%</span><span class="stat-label">Uptime</span></div>
+            </div>
+        </div>
+    </div>
+    <div class="auth-right">
+        <div class="auth-box">
+            <div class="auth-box-logo">
+                <svg width="30" height="30" viewBox="0 0 100 100" fill="none">
+                    <rect width="100" height="100" rx="14" fill="#0a0a0a"/>
+                    <path fill-rule="evenodd" d="M50,16 L15,84 H32 L39,63 H61 L68,84 H85 L50,16 Z M44,55 L50,30 L56,55 Z" fill="white"/>
+                </svg>
+                <span>AryaX</span>
+            </div>
+            <h2 id="authTitle">Welcome back</h2>
+            <p id="authSubtitle" class="auth-sub">Sign in to continue to AryaX</p>
+
+            <!-- SOCIAL LOGIN BUTTONS -->
+            <div class="social-btns">
+                <button class="social-btn" id="googleBtn" onclick="socialLogin('google')">
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    Continue with Google
+                </button>
+                <button class="social-btn" id="appleBtn" onclick="socialLogin('apple')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    Continue with Apple
+                </button>
+                <button class="social-btn" id="githubBtn" onclick="socialLogin('github')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    Continue with GitHub
+                </button>
+                <button class="social-btn" id="facebookBtn" onclick="socialLogin('facebook')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="#1877F2"><path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/></svg>
+                    Continue with Facebook
+                </button>
+                <button class="social-btn" id="twitterBtn" onclick="socialLogin('twitter')">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    Continue with Twitter / X
+                </button>
+                <button class="social-btn" id="phoneBtn" onclick="showPhoneAuth()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>
+                    Continue with Phone
+                </button>
+            </div>
+
+            <div class="auth-divider"><span>or</span></div>
+
+            <!-- EMAIL/USERNAME FORM -->
+            <form id="authForm">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="authUser" placeholder="Enter username" required autocomplete="username">
+                </div>
+                <div id="signupFields" style="display:none;">
+                    <div class="form-group">
+                        <label>Full Name <span class="req-star">*</span></label>
+                        <input type="text" id="authFullName" placeholder="Enter your full name" autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label>Email <span class="req-star">*</span></label>
+                        <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number <span class="req-star">*</span></label>
+                        <div class="phone-input-row">
+                            <select id="signupCountryCode" class="country-select">
+                                <option value="+91">🇮🇳 +91</option>
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+971">🇦🇪 +971</option>
+                                <option value="+61">🇦🇺 +61</option>
+                                <option value="+65">🇸🇬 +65</option>
+                                <option value="+49">🇩🇪 +49</option>
+                                <option value="+33">🇫🇷 +33</option>
+                                <option value="+81">🇯🇵 +81</option>
+                                <option value="+86">🇨🇳 +86</option>
+                            </select>
+                            <input type="tel" id="authMobile" placeholder="10-digit number" maxlength="10"
+                                oninput="this.value=this.value.replace(/\D/g,'').slice(0,10); validatePhone(this);"
+                                autocomplete="tel">
+                        </div>
+                        <div class="field-hint" id="phoneHint"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+                        <label style="margin:0;">Password <span class="req-star">*</span></label>
+                        <span class="forgot-link" id="forgotPassBtn" onclick="showForgotPassword()">Forgot password?</span>
+                    </div>
+                    <div class="pass-wrapper">
+                        <input type="password" id="authPass" placeholder="Min. 8 characters" required autocomplete="new-password"
+                            oninput="checkPasswordStrength(this.value)">
+                        <button type="button" class="eye-btn" onclick="togglePass('authPass', this)" tabindex="-1">
+                            <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                    <div class="pass-strength" id="passStrength" style="display:none;">
+                        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                        <span class="strength-label" id="strengthLabel"></span>
+                    </div>
+                </div>
+                <div class="form-group" id="confirmPassGroup" style="display:none;">
+                    <label>Confirm Password <span class="req-star">*</span></label>
+                    <div class="pass-wrapper">
+                        <input type="password" id="authConfirmPass" placeholder="Re-enter password"
+                            oninput="checkPasswordMatch()" autocomplete="new-password">
+                        <button type="button" class="eye-btn" onclick="togglePass('authConfirmPass', this)" tabindex="-1">
+                            <svg class="eye-open" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg class="eye-closed" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                    <div class="field-hint" id="confirmHint"></div>
+                </div>
+                <div id="termsGroup" style="display:none;margin-bottom:12px;">
+                    <label class="terms-check">
+                        <input type="checkbox" id="termsCheck">
+                        <span>I agree to the <a href="#" style="color:var(--text);text-underline-offset:3px;">Terms</a> &amp; <a href="#" style="color:var(--text);">Privacy Policy</a></span>
+                    </label>
+                </div>
+                <!-- CAPTCHA -->
+                <div class="captcha-box" id="captchaBox">
+                    <div class="captcha-check-row" id="captchaCheckRow" onclick="openCaptchaChallenge()">
+                        <div class="captcha-checkbox" id="captchaCheckbox">
+                            <svg id="captchaCheckIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="display:none;"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <span id="captchaLabel">I'm not a robot</span>
+                        <div class="captcha-logo">
+                            <svg width="28" height="28" viewBox="0 0 40 40" fill="none">
+                                <rect width="40" height="40" rx="8" fill="rgba(255,255,255,.06)"/>
+                                <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" font-size="18" fill="white">🤖</text>
+                            </svg>
+                            <span style="font-size:8px;color:var(--muted);text-align:center;line-height:1.2;">reCAPTCHA<br>Privacy·Terms</span>
+                        </div>
+                    </div>
+                    <!-- Math challenge (shown after checkbox click) -->
+                    <div class="captcha-challenge" id="captchaChallenge" style="display:none;">
+                        <p class="captcha-q">Solve to verify: <strong id="captchaQuestion"></strong></p>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <input type="number" id="captchaAnswer" class="captcha-input" placeholder="Answer" min="0" max="999">
+                            <button type="button" class="captcha-verify-btn" onclick="verifyCaptcha()">Verify</button>
+                            <button type="button" class="captcha-refresh-btn" onclick="refreshCaptcha()" title="New question">↻</button>
+                        </div>
+                        <div id="captchaError" style="font-size:11px;color:rgba(255,100,100,.8);margin-top:5px;"></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="auth-btn" id="authBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    <span id="authBtnText">Sign In</span>
+                </button>
+                <div id="authError" class="auth-error"></div>
+            </form>
+            <div class="auth-toggle">
+                <span id="toggleText">Don't have an account?</span>
+                <span id="toggleAuth">Sign up free</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── PHONE AUTH MODAL ── -->
+<div id="phoneModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9000;display:none;align-items:center;justify-content:center;">
+    <div class="phone-modal-card">
+        <button onclick="document.getElementById('phoneModal').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;">×</button>
+        <h3 style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;">Phone Sign In</h3>
+        <p style="color:#666;font-size:13px;margin-bottom:20px;">We'll send a verification code to your number</p>
+        <div id="phoneStep1">
+            <div class="form-group">
+                <label>Phone Number</label>
+                <div style="display:flex;gap:8px;">
+                    <select id="countryCode" style="padding:12px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:var(--font);font-size:13px;outline:none;width:100px;">
+                        <option value="+91">🇮🇳 +91</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+971">🇦🇪 +971</option>
+                        <option value="+61">🇦🇺 +61</option>
+                        <option value="+65">🇸🇬 +65</option>
+                        <option value="+49">🇩🇪 +49</option>
+                        <option value="+33">🇫🇷 +33</option>
+                        <option value="+81">🇯🇵 +81</option>
+                        <option value="+86">🇨🇳 +86</option>
+                    </select>
+                    <input type="tel" id="phoneInput" placeholder="Enter phone number" style="flex:1;padding:12px 14px;border-radius:9px;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--text);font-family:var(--font);font-size:14px;outline:none;">
+                </div>
+            </div>
+            <button class="auth-btn" onclick="sendOTP()" style="margin-top:4px;">Send OTP</button>
+        </div>
+        <div id="phoneStep2" style="display:none;">
+            <p style="color:#888;font-size:13px;margin-bottom:14px;">Enter the 6-digit code sent to your number</p>
+            <div style="display:flex;gap:8px;justify-content:center;margin-bottom:16px;">
+                <input class="otp-box" maxlength="1" type="tel"><input class="otp-box" maxlength="1" type="tel"><input class="otp-box" maxlength="1" type="tel">
+                <input class="otp-box" maxlength="1" type="tel"><input class="otp-box" maxlength="1" type="tel"><input class="otp-box" maxlength="1" type="tel">
+            </div>
+            <button class="auth-btn" onclick="verifyOTP()">Verify & Sign In</button>
+            <p style="text-align:center;margin-top:12px;font-size:12px;color:#666;">Didn't receive? <span style="cursor:pointer;text-decoration:underline;color:var(--text);" onclick="sendOTP()">Resend</span></p>
+        </div>
+        <div id="phoneError" style="color:rgba(255,100,100,.8);font-size:12px;margin-top:10px;"></div>
+    </div>
+</div>
+
+<!-- ── FORGOT PASSWORD MODAL ── -->
+<div id="forgotModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9000;align-items:center;justify-content:center;">
+    <div class="phone-modal-card">
+        <button onclick="document.getElementById('forgotModal').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#666;font-size:20px;cursor:pointer;">×</button>
+        <h3 style="font-family:'Outfit',sans-serif;font-size:22px;font-weight:800;margin-bottom:6px;">Reset Password</h3>
+        <p style="color:#666;font-size:13px;margin-bottom:20px;">Enter your username or email to reset your password</p>
+        <div class="form-group">
+            <label>Username or Email</label>
+            <input type="text" id="resetInput" placeholder="Enter username or email">
+        </div>
+        <button class="auth-btn" onclick="sendReset()" style="margin-top:4px;">Send Reset Link</button>
+        <div id="resetMsg" style="font-size:12px;margin-top:10px;text-align:center;color:#888;"></div>
+    </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  SCANNER OVERLAY                               -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="scannerOverlay" style="display:none; position:fixed; inset:0; background:#060608; z-index:40000; align-items:center; justify-content:center; flex-direction:column; color:#fff; font-family:'Outfit',sans-serif;">
+    <div class="scanner-circle"><div class="scanner-line"></div></div>
+    <div id="scanText" style="margin-top:24px; font-size:16px; letter-spacing:3px; font-weight:500; color:rgba(255,255,255,0.6); text-transform:uppercase;">Verifying Identity...</div>
+</div>
+
+<!-- ── TASK SCHEDULER OVERLAY ── -->
+<div id="taskOverlay" class="big-modal" style="display:none;">
+    <div class="dashboard-card" style="max-width: 600px;">
+        <header class="db-header">
+            <div class="db-title-group">
+                <span class="db-badge">AUTONOMOUS</span>
+                <h2>Task Scheduler</h2>
+            </div>
+            <button class="modal-close" onclick="closeTasks()">×</button>
+        </header>
+        <div class="form-group">
+            <label>What should AryaX do?</label>
+            <input type="text" id="taskInput" placeholder="e.g. Check AI news every 6 hours">
+        </div>
+        <button class="auth-btn" onclick="scheduleTask()">Activate Task</button>
+        <div id="taskList" style="margin-top:20px;" class="memory-list"></div>
+    </div>
+</div>
+
+<!-- ── SECURITY VAULT OVERLAY ── -->
+<div id="vaultOverlay" class="big-modal" style="display:none;">
+    <div class="dashboard-card" style="max-width: 500px; border: 1px solid rgba(239, 68, 68, 0.3);">
+        <header class="db-header">
+            <div class="db-title-group">
+                <span class="db-badge">SECURE VAULT</span>
+                <h2>Encrypted Storage</h2>
+            </div>
+            <button class="modal-close" onclick="closeVault()">×</button>
+        </header>
+        <div id="vaultLocked">
+            <p style="text-align:center; color:rgba(255,255,255,0.5);">Vault is Biometrically Locked.</p>
+            <button class="auth-btn" onclick="unlockVault()">Scan to Unlock</button>
+        </div>
+        <div id="vaultContent" style="display:none;">
+            <div class="form-group">
+                <input type="text" id="vaultKey" placeholder="Item Name">
+                <textarea id="vaultValue" placeholder="Secret Content" style="margin-top:10px;"></textarea>
+            </div>
+            <button class="auth-btn" onclick="saveToVault()">Secure Item</button>
+            <div id="vaultItems" class="memory-list" style="margin-top:20px;"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  NEURAL DASHBOARD OVERLAY                      -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="dashboardOverlay" class="big-modal" style="display:none;">
+    <div class="dashboard-card">
+        <header class="db-header">
+            <div class="db-title-group">
+                <span class="db-badge">NEURAL CORE</span>
+                <h2>Personal Intelligence Hub</h2>
+            </div>
+            <button class="modal-close" onclick="closeDashboard()">×</button>
+        </header>
+
+        <div class="db-grid">
+            <!-- Stats Column -->
+            <div class="db-stats-panel">
+                <div class="stat-card">
+                    <span class="label">NEURAL RANK</span>
+                    <h3 id="dbRank">Core Intelligence</h3>
+                </div>
+                <div class="stat-card">
+                    <span class="label">INTERACTIONS</span>
+                    <h3 id="dbChats">0</h3>
+                </div>
+                <div class="stat-card">
+                    <span class="label">ENERGY (CREDITS)</span>
+                    <h3 id="dbCredits">0</h3>
+                </div>
+            </div>
+
+            <!-- Memory Column -->
+            <div class="db-memory-panel">
+                <div class="panel-tag">PERSISTENT MEMORY VAULT</div>
+                <div id="memoryList" class="memory-list">
+                    <div class="empty-memory">No neural traces found yet. Talk to AryaX to build memory.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="db-visuals">
+            <div id="neuralCanvas" class="neural-canvas"></div>
+            <div class="db-footer-text">The Neural Core evolves as you interact with AryaX ASI.</div>
+        </div>
+    </div>
+</div>
+
+<!-- ── NEURAL MUSIC STUDIO ── -->
+<div id="musicStudio" class="big-modal" style="display:none;">
+    <div class="dashboard-card" style="max-width: 500px; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <header class="db-header">
+            <div class="db-title-group">
+                <span class="db-badge">MUSIC STUDIO</span>
+                <h2>Neural Soundscapes</h2>
+            </div>
+            <button class="modal-close" onclick="closeMusic()">×</button>
+        </header>
+        <div class="music-content">
+            <p style="color:rgba(255,255,255,0.5); font-size:12px; margin-bottom:20px;">Generating 3000-level quantum frequencies...</p>
+            <div class="visualizer-container"><div id="audioVisualizer" class="visualizer-bar"></div></div>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:30px;">
+                <button class="auth-btn" onclick="toggleNeuralMusic()">INITIATE FREQUENCY</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div id="mainApp" class="app-container" style="display:none;">
+    <div class="neural-glow glow-1"></div>
+    <div class="neural-glow glow-2"></div>
+
+    <!-- QUANTUM NEURAL-LINK OVERLAY -->
+
+
+<!-- ── GALACTIC EXPLORER MODAL ── -->
+<div id="galacticModal" class="big-modal" style="display:none;">
+    <div class="dashboard-card" style="max-width: 1000px; background: radial-gradient(circle at center, #000 0%, #0c0c1e 100%);">
+        <header class="db-header">
+            <div class="db-title-group">
+                <span class="db-badge">GALACTIC CORE</span>
+                <h2>Universal Explorer</h2>
+            </div>
+            <button class="modal-close" onclick="closeGalactic()">×</button>
+        </header>
+        <div id="spaceCanvas" class="space-view"></div>
+        <div class="space-controls">
+            <button class="tool-btn" onclick="travelTo('Mars')">Travel to Mars</button>
+            <button class="tool-btn" onclick="travelTo('Andromeda')">Andromeda Galaxy</button>
+            <button class="tool-btn" onclick="travelTo('BlackHole')">Event Horizon</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+<!-- ── UNIVERSAL KNOWLEDGE GRID ── -->
+<div id="knowledgeGrid" class="big-modal" style="display:none;">
+    <div class="dashboard-card" style="max-width: 900px; border: 1px solid rgba(255, 255, 255, 0.1);">
+        <header class="db-header">
+            <div class="db-title-group">
+                <span class="db-badge">UNIVERSAL GRID</span>
+                <h2>Galactic Knowledge Repository</h2>
+            </div>
+            <button class="modal-close" onclick="closeKnowledge()">×</button>
+        </header>
+        <div class="knowledge-browser">
+            <div class="k-sidebar">
+                <div class="k-item active">Quantum Civilizations</div>
+                <div class="k-item">Interstellar Travel</div>
+                <div class="k-item">Multiversal Physics</div>
+            </div>
+            <div id="kContent" class="k-main">
+                <h3>Select a topic to decrypt...</h3>
+            </div>
+        </div>
+    </div>
+</div>
+    <aside class="side-panel" id="sidePanel">
+        <div class="panel-header">
+            <div class="mini-logo" style="gap:10px;">
+                <!-- AryaX B&W Logo Mark -->
+                <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Outer square with rounded corners -->
+                    <rect width="100" height="100" rx="22" fill="#fff"/>
+                    <!-- A mark triangle -->
+                    <path d="M50 18L16 80H36L50 52L64 80H84L50 18Z" fill="#000"/>
+                    <!-- Crossbar -->
+                    <rect x="31" y="62" width="38" height="6" rx="3" fill="#000"/>
+                </svg>
+                <span style="font-size:17px;font-weight:800;letter-spacing:-0.5px;">AryaX</span>
+            </div>
+            <button id="newChat" class="pill-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                New Chat
+            </button>
+        </div>
+
+        <div class="mode-container">
+            <div class="section-label">AI Mode</div>
+            <select id="mode" class="capability-selector">
+                <option value="chat">SMART CHAT</option>
+                <option value="code">CODE MASTER</option>
+                <option value="webdev">WEB DEV</option>
+                <option value="image">IMAGE GEN</option>
+                <option value="document">DOCUMENT AI</option>
+                <option value="excel">EXCEL & DATA</option>
+                <option value="essay">ESSAY WRITER</option>
+                <option value="email">EMAIL PRO</option>
+                <option value="math">MATH SOLVER</option>
+                <option value="study">STUDY BUDDY</option>
+                <option value="cyber">CYBER SECURITY</option>
+                <option value="business">BUSINESS AI</option>
+                <option value="fitness">FITNESS COACH</option>
+                <option value="translate">TRANSLATOR</option>
+                <option value="aitutor">AI TUTOR</option>
+                <option value="social">SOCIAL MEDIA</option>
+                <option value="investor">INVESTOR MODE</option>
+                <option value="elite">ELITE (GPT-4O)</option>
+                <option value="researcher">AGENT: RESEARCHER</option>
+                <option value="architect">AGENT: ARCHITECT</option>
+                <option value="creative">AGENT: CREATIVE</option>
+                <option value="agent">🤖 AUTONOMOUS AGENT</option>
+                <option value="taskplanner">📋 TASK PLANNER</option>
+            </select>
+        </div>
+
+        <div class="mode-container">
+            <div class="section-label">AI Voice Personality</div>
+            <select id="voiceSelector" class="capability-selector" onchange="voiceASI.setVoice(this.selectedIndex)">
+                <option value="0">PREMIUM MALE</option>
+                <option value="1">SOPHISTICATED FEMALE</option>
+                <option value="2">NEURAL DEEP TECH</option>
+                <option value="3">GALACTIC WHISPER</option>
+                <option value="4">ROBOTIC ASI</option>
+                <option value="5">FRIENDLY ASSISTANT</option>
+                <option value="6">BRITISH SCHOLAR</option>
+                <option value="7">ZEN MASTER</option>
+                <option value="8">CYBER COMMANDER</option>
+                <option value="9">FUTURE VOYAGER</option>
+            </select>
+        </div>
+
+        <!-- 🧠 NEURAL THINKING FEED (B/W PROFESSIONAL) -->
+        <div class="mode-container" style="margin-top:20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top:20px;">
+            <div class="section-label" style="letter-spacing:2px; font-size:10px; opacity:0.6;">AUTONOMOUS CORE STREAM</div>
+            <div id="thinkingFeed" style="height:100px; font-family: 'Courier New', monospace; font-size:11px; color:rgba(255,255,255,0.7); overflow:hidden; display:flex; flex-direction:column-reverse; line-height:1.6; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+                <div class="feed-entry">> SYNCING NEURAL PATHWAYS...</div>
+            </div>
+        </div>
+        <div class="mode-container">
+            <div class="section-label">Neural Tools</div>
+            <div class="tool-list">
+                <button class="tool-btn" id="btnWebSearch">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    Live Web Search
+                </button>
+                <button class="tool-btn" id="btnCodeRunner">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    Python Sandbox
+                </button>
+                <button class="tool-btn" id="btnMemory">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    Neural Memory
+                </button>
+                <button class="tool-btn" id="btnDashboard" onclick="openDashboard()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Intelligence Hub
+                </button>
+                <button class="tool-btn" id="btnTasks" onclick="openTasks()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    Task Scheduler
+                </button>
+                <button class="tool-btn" id="btnVault" onclick="openVault()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    Security Vault
+                </button>
+                <button class="tool-btn" id="btnTimeline" onclick="openTimeline()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Timeline Simulator
+                </button>
+                <button class="tool-btn" id="btnMusic" onclick="openMusic()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    Neural Music
+                </button>
+                <button class="tool-btn" id="btnGalactic" onclick="openGalactic()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    Galactic Explorer
+                </button>
+                <button class="tool-btn tool-btn-agent" id="btnAgent" onclick="openAgentPanel()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+                    Autonomous Agent
+                </button>
+                <button class="tool-btn tool-btn-india" id="btnIndiaTools" onclick="openIndiaTools()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    India Tools
+                </button>
+                <button class="tool-btn" id="btnTaskPlanner" onclick="openTaskPlanner()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+                    Task Planner
+                </button>
+                <button class="tool-btn" id="btnMemoryMgr" onclick="openMemoryManager()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                    Memory Manager
+                </button>
+            </div>
+        </div>
+
+        <div class="section-label">History <span style="float:right;font-size:9px;color:var(--muted);cursor:pointer;" onclick="clearHistory()">Clear</span></div>
+        <div class="search-wrap">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="chatSearch" type="text" placeholder="Search chats..." oninput="filterChats(this.value)">
+        </div>
+        <div id="pinnedSection" style="display:none;margin-bottom:6px;">
+            <div class="section-label" style="font-size:9px;margin-top:4px;">Pinned</div>
+            <nav id="pinnedList" class="session-list"></nav>
+        </div>
+        <nav id="recentList" class="session-list"></nav>
+
+        <div class="panel-footer">
+            <button class="tool-btn" id="themeToggle">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <span id="themeToggleText">Light Mode</span>
+            </button>
+            <div class="user-pill">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div id="userAvatar" class="user-avatar">AX</div>
+                    <div>
+                        <div id="userName" style="font-size:13px; font-weight:600;">Account</div>
+                        <div id="creditCount" class="credit-badge-sm">0 credits</div>
+                    </div>
+                </div>
+                <button id="upgradeBtnNav" class="action-icon" title="Upgrade to Pro" onclick="openPricingModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </button>
+                <button id="profileBtn" class="action-icon" title="Profile" onclick="openProfile()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+                <button id="logoutBtn" class="action-icon" title="Logout">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+            </div>
+            <button class="studio-btn" id="btnStudio" onclick="toggleStudio()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Enter AryaX Studio
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT -->
+    <main class="chat-viewport">
+        <header class="top-nav">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <button id="toggleSidebar" class="action-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <!-- AryaX Top Nav Logo -->
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <svg width="24" height="24" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="100" height="100" rx="22" fill="#fff"/>
+                        <path d="M50 18L16 80H36L50 52L64 80H84L50 18Z" fill="#000"/>
+                        <rect x="31" y="62" width="38" height="6" rx="3" fill="#000"/>
+                    </svg>
+                    <span id="modeLabel" class="mode-label" style="font-weight:700;color:var(--text);">AryaX · Smart Chat</span>
+                </div>
+            </div>
+            <div class="nav-right">
+                <span id="creditDisplay" class="credit-badge">10,000 Credits</span>
+                <button onclick="openExportMenu()" class="nav-icon-btn" title="Export Chat (Ctrl+E)">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+                <button onclick="openCommandPalette()" class="nav-icon-btn" title="Command Palette (Ctrl+K)">⌘K</button>
+            </div>
+        </header>
+
+        <div id="chat" class="message-stream">
+            <div class="welcome-hero">
+                <div class="welcome-icon">
+                    <svg width="52" height="52" viewBox="0 0 100 100" fill="none">
+                        <rect width="100" height="100" rx="20" fill="rgba(255,255,255,0.08)"/>
+                        <path fill-rule="evenodd" d="M50,16 L15,84 H32 L39,63 H61 L68,84 H85 L50,16 Z M44,55 L50,30 L56,55 Z" fill="white"/>
+                    </svg>
+                </div>
+                <h1>How can I help you today?</h1>
+                <p>I am AryaX, your Artificial Super Intelligence. Ask me anything — from coding to creative writing, business to science.</p>
+                <div class="quick-actions">
+                    <button class="quick-btn" onclick="quickAsk('Write a Python web scraper')">Write Python Code</button>
+                    <button class="quick-btn" onclick="quickAsk('Create a business plan for my startup')">Business Plan</button>
+                    <button class="quick-btn" onclick="quickAsk('Generate an image of a futuristic city')">Generate Image</button>
+                    <button class="quick-btn" onclick="quickAsk('Explain quantum computing simply')">Explain a Concept</button>
+                    <button class="quick-btn" onclick="openAgentPanel()">Autonomous Agent</button>
+                    <button class="quick-btn" onclick="openIndiaTools()">India Tools</button>
+                </div>
+            </div>
+        </div>
+
+        <footer class="input-zone">
+            <div class="floating-pill">
+                <div id="filePreview" class="file-preview-container" style="display:none;">
+                    <span id="fileName" class="file-name"></span>
+                    <button id="removeFile" class="remove-file-btn">×</button>
+                </div>
+                <div class="input-wrapper">
+                    <button id="attachBtn" class="action-icon" title="Attach file">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                    </button>
+                    <button id="imageBtn" class="action-icon" title="Generate image">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    </button>
+                    <input type="file" id="fileInput" style="display:none;" accept="image/*,.pdf,.txt,.csv">
+                    <textarea id="input" placeholder="Message AryaX..." rows="1"></textarea>
+                    <div class="input-actions">
+                        <button id="micBtn" class="action-icon" title="Neural Voice Mode">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        </button>
+                        <div id="voiceStatus" class="voice-status-pill" style="display:none;">Neural Voice Active</div>
+                        <button id="send" class="send-pill" title="Send">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-legal">AryaX · Artificial Super Intelligence · Use responsibly</div>
+        </footer>
+
+        <!-- NEURAL AVATAR (AI FACE) -->
+        <div id="neuralAvatar" class="neural-avatar-container">
+            <div class="avatar-ring ring-1"></div>
+            <div class="avatar-ring ring-2"></div>
+            <div class="avatar-ring ring-3"></div>
+            <div class="avatar-core">
+                <svg viewBox="0 0 100 100" class="avatar-svg">
+                    <circle cx="50" cy="50" r="45" stroke="url(#avatarGradient)" stroke-width="2" fill="none" class="outer-glow"/>
+                    <path d="M30 50 Q50 20 70 50 Q50 80 30 50" class="neural-pulse" stroke="#fff" stroke-width="1.5" fill="none"/>
+                    <defs>
+                        <linearGradient id="avatarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fff;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#888;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="avatar-status">CORE ACTIVE</div>
+        </div>
+
+        <div id="voiceOrb" class="voice-orb" style="display:none;">
+            <div class="orb-core"></div>
+            <div class="orb-ring"></div>
+            <div class="orb-ring reverse"></div>
+        </div>
+    </main>
+
+    <!-- ARYAX STUDIO (WORKSPACE) -->
+    <aside id="studioPanel" class="studio-panel" style="display:none;">
+        <div class="studio-header">
+            <div class="st-brand">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2.5"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                <span>AryaX Studio</span>
+            </div>
+            <div class="st-actions">
+                <button class="st-pill" onclick="runStudioProject()">Run Project</button>
+                <button id="closeStudio" class="icon-btn">×</button>
+            </div>
+        </div>
+        <div class="studio-main">
+            <div class="st-sidebar">
+                <div class="st-label">Files</div>
+                <div id="stFileList" class="st-file-list"></div>
+            </div>
+            <div class="st-editor-wrap">
+                <div class="st-file-tab" id="stActiveFile">index.html</div>
+                <textarea id="stEditor" spellcheck="false" placeholder="Write code here..."></textarea>
+            </div>
+            <div class="st-preview-wrap">
+                <div class="st-label">Live Output</div>
+                <iframe id="stPreviewFrame"></iframe>
+            </div>
+        </div>
+    </aside>
+</div>
+<!-- PROFILE MODAL -->
+<div id="profileModal" class="big-modal">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeProfile()">×</button>
+    <div class="modal-title">My Profile</div>
+    <div class="profile-avatar-big" id="profileAvatarBig">AX</div>
+    <div style="text-align:center;margin-bottom:16px;">
+      <div style="font-size:16px;font-weight:700;" id="profileName">Account</div>
+      <div style="font-size:12px;color:var(--muted);" id="profileJoined">Member</div>
+    </div>
+    <div class="profile-stat-row">
+      <div class="profile-stat"><div class="num" id="statMsgs">0</div><div class="lbl">Messages</div></div>
+      <div class="profile-stat"><div class="num" id="statCredits">0</div><div class="lbl">Credits</div></div>
+      <div class="profile-stat"><div class="num" id="statChats">0</div><div class="lbl">Chats</div></div>
+    </div>
+    <div style="margin-top:16px;">
+      <div class="setting-row">
+        <label>AI Persona Tone</label>
+        <select id="personaTone" onchange="savePersona()">
+          <option value="balanced">Balanced</option>
+          <option value="formal">Formal</option>
+          <option value="casual">Casual</option>
+          <option value="expert">Expert</option>
+          <option value="concise">Concise</option>
+          <option value="creative">Creative</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>AI Name</label>
+        <input type="text" id="personaName" value="AryaX" placeholder="Custom AI name" onchange="savePersona()">
+      </div>
+      <div class="setting-row">
+        <label>Memory Mode</label>
+        <div class="toggle-sw" id="memoryToggle" onclick="this.classList.toggle('on');savePersona();"></div>
+      </div>
+      <div class="setting-row">
+        <label>Stream Responses</label>
+        <div class="toggle-sw on" id="streamToggle" onclick="this.classList.toggle('on');savePersona();"></div>
+      </div>
+    </div>
+    <button class="auth-btn" onclick="closeProfile()" style="margin-top:20px;">Save & Close</button>
+  </div>
+</div>
+
+<!-- COMMAND PALETTE -->
+<div id="cmdPalette" class="cmd-palette" onclick="if(event.target===this)closeCmdPalette()">
+  <div class="cmd-box">
+    <div class="cmd-input-wrap">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input class="cmd-input" id="cmdInput" placeholder="Type a command..." oninput="filterCommands(this.value)" onkeydown="cmdKeyNav(event)">
+      <span style="font-size:10px;color:var(--muted);border:1px solid var(--border);padding:2px 6px;border-radius:4px;">ESC</span>
+    </div>
+    <div class="cmd-results" id="cmdResults"></div>
+  </div>
+</div>
+
+<!-- EXPORT MENU -->
+<div id="exportMenu" class="export-menu" onclick="event.stopPropagation()">
+  <div class="export-item" onclick="exportChat('json')">📦 Export as JSON</div>
+  <div class="export-item" onclick="exportChat('txt')">📝 Export as Text</div>
+  <div class="export-item" onclick="exportChat('md')">📜 Export as Markdown</div>
+  <div class="export-item" onclick="exportChat('pdf')">📄 Export as PDF</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  AUTONOMOUS AGENT MODAL                        -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="agentModal" class="big-modal" style="display:none;" onclick="if(event.target===this)closeAgentPanel()">
+  <div class="dashboard-card" style="max-width:680px;">
+    <header class="db-header">
+      <div class="db-title-group">
+        <span class="db-badge" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">AUTONOMOUS</span>
+        <h2>Autonomous Agent</h2>
+      </div>
+      <button class="modal-close" onclick="closeAgentPanel()">×</button>
+    </header>
+    <p style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:16px;">AI will Think → Research → Execute → Verify your task automatically</p>
+    <div class="form-group">
+      <label>What task should AryaX complete autonomously?</label>
+      <textarea id="agentTaskInput" rows="3" placeholder="e.g. Research the top 5 AI tools in 2025 and create a comparison report"
+        style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;padding:12px;font-family:inherit;font-size:14px;resize:vertical;"></textarea>
+    </div>
+    <button class="auth-btn" id="agentRunBtn" onclick="runAutonomousAgent()" style="margin-bottom:16px;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      Run Agent
+    </button>
+    <!-- Agent Progress -->
+    <div id="agentProgress" style="display:none;">
+      <div class="agent-steps" id="agentSteps"></div>
+    </div>
+    <!-- Agent Result -->
+    <div id="agentResult" style="display:none;">
+      <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;margin-top:16px;">
+        <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-bottom:10px;">AGENT OUTPUT</div>
+        <div id="agentResultText" style="color:rgba(255,255,255,0.85);font-size:14px;line-height:1.7;max-height:300px;overflow-y:auto;white-space:pre-wrap;"></div>
+        <button class="tool-btn" onclick="sendAgentResultToChat()" style="margin-top:12px;">
+          💬 Send to Chat
+        </button>
+      </div>
+    </div>
+    <!-- Task History -->
+    <div id="agentHistory" style="margin-top:16px;border-top:1px solid rgba(255,255,255,0.06);padding-top:14px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.3);margin-bottom:10px;">RECENT TASKS</div>
+      <div id="agentTaskHistory" style="max-height:150px;overflow-y:auto;"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  TASK PLANNER MODAL                            -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="taskPlannerModal" class="big-modal" style="display:none;" onclick="if(event.target===this)closeTaskPlanner()">
+  <div class="dashboard-card" style="max-width:640px;">
+    <header class="db-header">
+      <div class="db-title-group">
+        <span class="db-badge">PLANNER</span>
+        <h2>Task Planner</h2>
+      </div>
+      <button class="modal-close" onclick="closeTaskPlanner()">×</button>
+    </header>
+    <p style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:16px;">Describe your goal — AryaX will break it into a step-by-step action plan</p>
+    <div class="form-group">
+      <label>Your Goal</label>
+      <input type="text" id="plannerGoalInput" placeholder="e.g. Launch my SaaS product in 30 days" style="width:100%;">
+    </div>
+    <button class="auth-btn" id="plannerBtn" onclick="generateTaskPlan()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Generate Plan
+    </button>
+    <div id="plannerResult" style="margin-top:20px;display:none;">
+      <div id="plannerSteps"></div>
+      <button class="tool-btn" onclick="sendPlanToChat()" style="margin-top:12px;">💬 Send Plan to Chat</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  INDIA TOOLS MODAL                             -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="indiaToolsModal" class="big-modal" style="display:none;" onclick="if(event.target===this)closeIndiaTools()">
+  <div class="dashboard-card" style="max-width:680px;">
+    <header class="db-header">
+      <div class="db-title-group">
+        <span class="db-badge" style="background:linear-gradient(135deg,#f97316,#16a34a);">INDIA</span>
+        <h2>India Tools</h2>
+      </div>
+      <button class="modal-close" onclick="closeIndiaTools()">×</button>
+    </header>
+    <!-- Tab buttons -->
+    <div class="india-tabs" id="indiaTabBtns" style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;">
+      <button class="india-tab-btn active" onclick="switchIndiaTab('gst',this)">GST Calculator</button>
+      <button class="india-tab-btn" onclick="switchIndiaTab('resume',this)">Resume Builder</button>
+      <button class="india-tab-btn" onclick="switchIndiaTab('invoice',this)">Invoice Generator</button>
+      <button class="india-tab-btn" onclick="switchIndiaTab('translate',this)">Translator</button>
+    </div>
+
+    <!-- GST TAB -->
+    <div id="tab-gst" class="india-tab-content">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div class="form-group">
+          <label>Amount (₹)</label>
+          <input type="number" id="gstAmount" placeholder="Enter amount" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>GST Rate (%)</label>
+          <select id="gstRate">
+            <option value="5">5% (Essentials)</option>
+            <option value="12">12% (Standard)</option>
+            <option value="18" selected>18% (Standard+)</option>
+            <option value="28">28% (Luxury)</option>
+            <option value="0">0% (Exempt)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Calculation Type</label>
+          <select id="gstType">
+            <option value="exclusive">GST Exclusive (Add GST to amount)</option>
+            <option value="inclusive">GST Inclusive (Extract GST from amount)</option>
+          </select>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="calculateGST()">Calculate GST</button>
+      <div id="gstResult" style="margin-top:16px;display:none;" class="india-result-card"></div>
+    </div>
+
+    <!-- RESUME TAB -->
+    <div id="tab-resume" class="india-tab-content" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="resumeName" placeholder="Rahul Sharma">
+        </div>
+        <div class="form-group">
+          <label>Target Role</label>
+          <input type="text" id="resumeRole" placeholder="Software Engineer">
+        </div>
+        <div class="form-group">
+          <label>Experience</label>
+          <input type="text" id="resumeExp" placeholder="2 years at TCS, 1 year at Infosys">
+        </div>
+        <div class="form-group">
+          <label>Skills</label>
+          <input type="text" id="resumeSkills" placeholder="Python, React, Node.js, SQL">
+        </div>
+        <div class="form-group">
+          <label>Education</label>
+          <input type="text" id="resumeEdu" placeholder="B.Tech CSE, Gujarat University 2022">
+        </div>
+        <div class="form-group">
+          <label>Projects (optional)</label>
+          <input type="text" id="resumeProjects" placeholder="E-commerce app, AI chatbot">
+        </div>
+      </div>
+      <button class="auth-btn" id="resumeBtn" onclick="buildResume()">Build AI Resume</button>
+      <div id="resumeResult" style="margin-top:16px;display:none;">
+        <textarea id="resumeOutput" rows="12" style="width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;padding:14px;font-family:'Courier New',monospace;font-size:12px;"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button class="tool-btn" onclick="copyResume()">Copy Resume</button>
+          <button class="tool-btn" onclick="sendResumeToChat()">Send to Chat</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INVOICE TAB -->
+    <div id="tab-invoice" class="india-tab-content" style="display:none;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div class="form-group">
+          <label>Business Name</label>
+          <input type="text" id="invBusiness" placeholder="My Business Pvt Ltd">
+        </div>
+        <div class="form-group">
+          <label>Client Name</label>
+          <input type="text" id="invClient" placeholder="Client Company">
+        </div>
+        <div class="form-group">
+          <label>GST Rate (%)</label>
+          <select id="invGstRate">
+            <option value="5">5%</option>
+            <option value="12">12%</option>
+            <option value="18" selected>18%</option>
+            <option value="28">28%</option>
+          </select>
+        </div>
+      </div>
+      <div id="invoiceItems">
+        <div class="form-group" style="margin-top:8px;">
+          <label>Items</label>
+          <div id="invItemList">
+            <div class="inv-item-row" style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;margin-bottom:8px;align-items:center;">
+              <input type="text" class="inv-name" placeholder="Item name">
+              <input type="number" class="inv-qty" placeholder="Qty" value="1">
+              <input type="number" class="inv-rate" placeholder="Rate (₹)">
+              <button onclick="removeInvItem(this)" style="background:rgba(255,0,0,0.2);border:none;color:#fff;border-radius:6px;padding:8px;cursor:pointer;">×</button>
+            </div>
+          </div>
+          <button class="tool-btn" onclick="addInvItem()" style="margin-top:8px;">+ Add Item</button>
+        </div>
+      </div>
+      <button class="auth-btn" onclick="generateInvoice()">Generate Invoice</button>
+      <div id="invoiceResult" style="margin-top:16px;display:none;" class="india-result-card"></div>
+    </div>
+
+    <!-- TRANSLATE TAB -->
+    <div id="tab-translate" class="india-tab-content" style="display:none;">
+      <div class="form-group">
+        <label>Text to Translate</label>
+        <textarea id="translateInput" rows="4" placeholder="Type your text here..."
+          style="width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;color:#fff;padding:12px;font-family:inherit;font-size:14px;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Translate to</label>
+        <select id="translateTarget">
+          <option value="Gujarati">Gujarati (ગુજરાતી)</option>
+          <option value="Hindi">Hindi (हिंदी)</option>
+          <option value="English">English</option>
+          <option value="Marathi">Marathi (मराठी)</option>
+          <option value="Tamil">Tamil (தமிழ்)</option>
+          <option value="Telugu">Telugu (తెలుగు)</option>
+          <option value="Kannada">Kannada (ಕನ್ನಡ)</option>
+          <option value="Bengali">Bengali (বাংলা)</option>
+        </select>
+      </div>
+      <button class="auth-btn" id="translateBtn" onclick="translateText()">Translate</button>
+      <div id="translateResult" style="margin-top:16px;display:none;">
+        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px;">
+          <div style="font-size:10px;color:rgba(255,255,255,0.4);margin-bottom:8px;font-weight:700;letter-spacing:1px;">TRANSLATION</div>
+          <div id="translateOutput" style="color:#fff;font-size:15px;line-height:1.7;"></div>
+        </div>
+        <button class="tool-btn" onclick="sendTranslationToChat()" style="margin-top:10px;">Send to Chat</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  MEMORY MANAGER MODAL                          -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="memoryManagerModal" class="big-modal" style="display:none;" onclick="if(event.target===this)closeMemoryManager()">
+  <div class="dashboard-card" style="max-width:560px;">
+    <header class="db-header">
+      <div class="db-title-group">
+        <span class="db-badge">MEMORY</span>
+        <h2>Memory Manager</h2>
+      </div>
+      <button class="modal-close" onclick="closeMemoryManager()">×</button>
+    </header>
+    <p style="color:rgba(255,255,255,0.5);font-size:13px;margin-bottom:16px;">AryaX remembers these facts about you. Edit or delete any entry.</p>
+    <div id="memMgrList" style="max-height:300px;overflow-y:auto;margin-bottom:16px;"></div>
+    <!-- Add new memory -->
+    <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:16px;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.4);margin-bottom:10px;">ADD NEW MEMORY</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;">
+        <input type="text" id="newMemKey" placeholder="Key (e.g. name, job)">
+        <input type="text" id="newMemValue" placeholder="Value (e.g. Rahul, Developer)">
+        <button class="auth-btn" onclick="addMemoryEntry()" style="padding:0 16px;white-space:nowrap;">Add</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!--  PRICING / SUBSCRIPTION MODAL                  -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="pricingModal" class="big-modal" style="display:none;" onclick="if(event.target===this)closePricingModal()">
+  <div class="dashboard-card" style="max-width:400px; text-align:center;">
+    <header class="db-header" style="justify-content:center; position:relative;">
+      <h2 style="font-family:var(--brand);font-weight:800;font-size:24px;">AryaX <span style="color:#FFD700;">PRO</span></h2>
+      <button class="modal-close" style="position:absolute; right:0;" onclick="closePricingModal()">×</button>
+    </header>
+    <p style="color:rgba(255,255,255,0.6);font-size:14px;margin-bottom:24px;line-height:1.6;">Unlock Infinite Intelligence</p>
+    
+    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:20px; text-align:left; margin-bottom:24px;">
+      <div style="font-size:16px; font-weight:700; margin-bottom:12px;">Pro Features</div>
+      <ul style="color:var(--muted); font-size:13px; padding-left:20px; line-height:2;">
+        <li>1,000,000 Neural Credits</li>
+        <li>Advanced Code Sandbox</li>
+        <li>PDF & Excel Document Automation</li>
+        <li>Priority Autonomous Agent Access</li>
+      </ul>
+    </div>
+    
+    <button id="upgradeBtn" class="auth-btn" style="width:100%; font-size:16px; padding:12px; background:#fff; color:#000;" onclick="upgradeToPro()">Upgrade Now - $9.99/mo</button>
+  </div>
+</div>
+
+<script>
+    function openPricingModal() { document.getElementById('pricingModal').style.display = 'flex'; }
+    function closePricingModal() { document.getElementById('pricingModal').style.display = 'none'; }
+</script>
+
+<div id="screenshotShield" style="display:none; position:fixed; inset:0; background:#000; z-index:99999; color:#fff; align-items:center; justify-content:center; flex-direction:column; font-family:'Outfit',sans-serif; font-weight:800; font-size:32px; letter-spacing:3px;">
+    SECURITY PROTOCOL ACTIVE
+    <span style="font-size:15px; color:#888; margin-top:12px; font-weight:400; letter-spacing:1px;">Screenshots are restricted.</span>
+</div>
+
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.0/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+<style>
+    .chart-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;margin:12px 0;width:100%;max-width:500px;}
+    .download-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);color:#fff;padding:8px 18px;border-radius:20px;font-size:13px;text-decoration:none;margin-top:8px;transition:.2s;font-weight:600;border:1px solid rgba(255,255,255,.15);}
+    .download-pill:hover{background:rgba(255,255,255,.14);transform:translateY(-1px);}
+
+@keyframes scanline {
+    from { transform: translateY(0); }
+    to { transform: translateY(100%); }
+}
+
+/* ═══════════════════════════════════════════════ */
+/*  SELF-EVOLUTION & ORACLE STYLES                 */
+/* ═══════════════════════════════════════════════ */
+.evolution-core {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+    width: 220px;
+    background: rgba(6, 6, 8, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 12px;
+    z-index: 5000;
+}
+
+.evolution-status {
+    font-size: 8px;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    margin-top: 8px;
+    font-weight: 800;
+}
+
+.oracle-container {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 5000;
+    transition: 0.3s;
+}
+
+.oracle-orb {
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, #fff, #888);
+    border-radius: 50%;
+    box-shadow: 0 0 40px rgba(255,255,255,0.3);
+    animation: oracleFloat 3s ease-in-out infinite;
+}
+
+.oracle-text {
+    position: absolute;
+    bottom: -20px;
+    font-size: 8px;
+    font-weight: 800;
+    color: #fff;
+    opacity: 0.5;
+    white-space: nowrap;
+}
+
+@keyframes oracleFloat {
+    0%, 100% { transform: translateY(0) scale(1); filter: hue-rotate(0deg); }
+    50% { transform: translateY(-10px) scale(1.1); filter: hue-rotate(90deg); }
+}
+
+/* Draggable Window Class */
+.big-modal.window-mode {
+    position: absolute;
+    inset: auto;
+    width: 800px;
+    height: 600px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 50px 100px rgba(0,0,0,0.5);
+}
+/* ═══════════════════════════════════════════════ */
+/*  LEVEL 3000: UNIVERSAL INTELLIGENCE             */
+/* ═══════════════════════════════════════════════ */
+.clone-overlay {
+    position: fixed;
+    top: 20px;
+    right: 300px;
+    display: flex;
+    gap: 15px;
+    z-index: 4000;
+}
+
+.clone-unit {
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 10px;
+    border-radius: 8px;
+    width: 120px;
+}
+
+.clone-unit span { font-size: 8px; font-weight: 800; color: #fff; opacity: 0.6; }
+.progress-bar { height: 2px; background: rgba(255,255,255,0.1); margin-top: 5px; overflow: hidden; }
+.progress-bar .fill { height: 100%; background: #fff; width: 0; animation: fillProgress 3s linear infinite; }
+
+@keyframes fillProgress {
+    0% { width: 0; }
+    50% { width: 80%; }
+    100% { width: 0; }
+}
+
+.knowledge-browser { display: flex; height: 500px; }
+.k-sidebar { width: 200px; border-right: 1px solid rgba(255,255,255,0.1); padding: 10px; }
+.k-item { padding: 10px; font-size: 12px; cursor: pointer; color: rgba(255,255,255,0.6); transition: 0.2s; }
+.k-item:hover, .k-item.active { color: #fff; background: rgba(255, 255, 255, 0.08); }
+.k-main { flex: 1; padding: 20px; overflow-y: auto; color: rgba(255,255,255,0.8); }
+
+/* Holographic Parallax Effect */
+.app-container {
+    perspective: 1000px;
+    transition: 0.1s;
+}
+
+.visualizer-container { height: 100px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 12px; margin-top: 20px; }
+.visualizer-bar { width: 40px; height: 10%; background: #fff; border-radius: 4px; transition: 0.2s ease-in-out; box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
+
+/* ═══════════════════════════════════════════════ */
+/*  LEVEL 1,000,000: GALACTIC INTELLIGENCE         */
+/* ═══════════════════════════════════════════════ */
+.wake-status {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    z-index: 10000;
+}
+
+.wake-dot {
+    width: 8px;
+    height: 8px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
+    animation: blink 2s infinite;
+}
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.space-view {
+    height: 500px;
+    width: 100%;
+    background: #000;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+}
+
+.space-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+#btnMusic { border-color: rgba(255, 255, 255, 0.1); }
+#btnMusic:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+</style>
+<script src="script.js?v=4.3"></script>
+</body>
+</html>
