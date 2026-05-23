@@ -1,3 +1,20 @@
+
+// ── JWT AUTH INTERCEPTOR ──────────────────────────────
+const originalFetch = window.fetch;
+window.fetch = async function() {
+    let [resource, config] = arguments;
+    if (typeof resource === 'string' && resource.startsWith('/api/') && !resource.includes('/api/login') && !resource.includes('/api/signup')) {
+        const token = localStorage.getItem('aryax-token');
+        if (token) {
+            config = config || {};
+            config.headers = config.headers || {};
+            config.headers['Authorization'] = `Bearer ${token}`;
+            arguments[1] = config;
+        }
+    }
+    return originalFetch.apply(this, arguments);
+};
+
 // ── HELPERS ──────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const chatArea = $('chat'), inputEl = $('input'), sendBtn = $('send');
@@ -309,6 +326,7 @@ $('authForm').onsubmit = async (e) => {
         const cp = $('authConfirmPass') ? $('authConfirmPass').value : '';
         if (p !== cp) { $('authError').textContent = 'Passwords do not match'; return; }
         if (!$('termsCheck').checked) { $('authError').textContent = 'Please accept the Terms & Privacy Policy'; return; }
+        if (!captchaPassed) { $('authError').textContent = 'Please verify that you are not a robot'; return; }
     }
 
     $('authError').textContent = isSignUpMode ? 'Creating account...' : 'Signing in...';
@@ -323,13 +341,14 @@ $('authForm').onsubmit = async (e) => {
             body: JSON.stringify(payload)
         });
         const d = await r.json();
-        if (r.ok) loginSuccess(d.username || u, d.credits);
+        if (r.ok) loginSuccess(d.username || u, d.credits, d.token);
         else $('authError').textContent = d.error || 'Authentication failed';
     } catch { $('authError').textContent = 'Server connection error'; }
 };
 
 
-async function loginSuccess(username, credits) {
+async function loginSuccess(username, credits, token) {
+    if (token) localStorage.setItem("aryax-token", token);
     const scanner = $('scannerOverlay');
     scanner.style.display = 'flex';
     const scanTexts = ['VERIFYING IDENTITY...', 'SCANNING NEURAL SIGNATURE...', 'ACCESS GRANTED. WELCOME.'];
@@ -378,7 +397,7 @@ async function loadHistory() {
     try {
         const r = await fetch(`/api/history/load?username=${currentUser}`);
         const d = await r.json();
-        if (r.ok) renderSidebar(d.chats || []);
+        if (r.ok) renderSidebarFull(d.chats || []);
     } catch {}
 }
 
@@ -407,23 +426,40 @@ function newChatSession() {
     currentChatId = Date.now().toString();
     const hr = new Date().getHours();
     const greet = hr < 12 ? 'Good morning' : (hr < 17 ? 'Good afternoon' : 'Good evening');
+    let displayUser = currentUser || 'User';
+    // Remove "facebook_", "google_", etc prefixes
+    displayUser = displayUser.replace(/^(facebook|google|github|apple|twitter)_/i, '');
+    // Remove trailing numbers and underscores
+    displayUser = displayUser.replace(/_[0-9]+$/, '').replace(/_/g, ' ');
+    // Title case
+    displayUser = displayUser.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+    
+    // If it ends up being just "User", make it more professional
+    if (!displayUser || displayUser.trim().toLowerCase() === 'user') {
+        displayUser = 'User';
+    }
+
     chatArea.innerHTML = `
-    <div class="welcome-hero">
-        <div class="welcome-icon">
-            <svg width="52" height="52" viewBox="0 0 100 100" fill="none">
-                <rect width="100" height="100" rx="20" fill="rgba(255,255,255,0.08)"/>
-                <path fill-rule="evenodd" d="M50,16 L15,84 H32 L39,63 H61 L68,84 H85 L50,16 Z M44,55 L50,30 L56,55 Z" fill="white"/>
-            </svg>
-        </div>
-        <h1>${greet}, ${currentUser}!</h1>
-        <p>I am AryaX, your Artificial Super Intelligence. What shall we work on today?</p>
-        <div class="quick-actions">
-            <button class="quick-btn" onclick="quickAsk('Write a Python web scraper for me')">Write Python code</button>
-            <button class="quick-btn" onclick="quickAsk('Create a business plan for my startup')">Business plan</button>
-            <button class="quick-btn" onclick="quickAsk('Generate an image of a futuristic city')">Generate image</button>
-            <button class="quick-btn" onclick="quickAsk('Explain quantum computing simply')">Explain a concept</button>
+    <div class="welcome-hero luxury-hero">
+        <!-- Cinematic Background Canvas -->
+        <canvas id="cinematicBg" class="cinematic-canvas"></canvas>
+        
+        <div class="luxury-content">
+            <div class="luxury-logo-wrap">
+                <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="100" height="100" rx="0" fill="#fff"/>
+                    <path d="M50 18L16 80H36L50 52L64 80H84L50 18Z" fill="#000"/>
+                </svg>
+            </div>
+            <div class="luxury-text-reveal">
+                <h1 class="luxury-greeting">INITIALIZING</h1>
+                <p class="luxury-sub">WELCOME BACK, ${displayUser.toUpperCase()}</p>
+            </div>
         </div>
     </div>`;
+    
+    // Initialize the canvas animation after injecting
+    setTimeout(initCinematicBg, 50);
 }
 
 $('newChat').onclick = () => {
@@ -461,10 +497,46 @@ $('btnMemory').onclick = function() {
 };
 
 // ── MODE LABEL ────────────────────────────────────────
-const modeEl = $('mode'), modeLabel = $('modeLabel');
+const modeEl = $('mode');
 modeEl.onchange = () => {
-    modeLabel.textContent = `AryaX · ${modeEl.options[modeEl.selectedIndex].text}`;
+    const selectedText = modeEl.options[modeEl.selectedIndex].text;
+    const modelName = $('currentModelName');
+    if (modelName) modelName.textContent = `AryaX · ${selectedText}`;
 };
+
+// ── MODEL SWITCHER (GEMINI-STYLE DROPDOWN) ────────────
+function selectModel(el) {
+    const mode = el.dataset.mode;
+    // Update the hidden select
+    modeEl.value = mode;
+    modeEl.onchange();
+    // Update visual state
+    document.querySelectorAll('.model-option').forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    // Get name text
+    const name = el.querySelector('.mo-name').textContent.replace(/Default|Pro|New/g, '').trim();
+    $('currentModelName').textContent = `AryaX · ${name}`;
+    // Close dropdown
+    $('modelSwitcher').classList.remove('open');
+}
+
+// Toggle model dropdown
+document.addEventListener('DOMContentLoaded', () => {
+    const switcher = $('modelSwitcher');
+    const btn = $('modelSwitcherBtn');
+    if (btn) {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            switcher.classList.toggle('open');
+        });
+    }
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+        if (switcher && !switcher.contains(e.target)) {
+            switcher.classList.remove('open');
+        }
+    });
+});
 
 // ── THEME ─────────────────────────────────────────────
 const themeToggleBtn = $('themeToggle'), themeToggleText = $('themeToggleText');
@@ -480,6 +552,7 @@ themeToggleBtn.onclick = () => {
 // ── LOGOUT ────────────────────────────────────────────
 $('logoutBtn').onclick = () => {
     localStorage.removeItem('aryax-user');
+    localStorage.removeItem('aryax-token');
     location.reload();
 };
 
@@ -598,6 +671,83 @@ class NeuralVoiceV3 {
 
 const voiceASI = new NeuralVoiceV3();
 
+// ── CINEMATIC BACKGROUND ANIMATION ───────────────────────
+function initCinematicBg() {
+    const canvas = document.getElementById('cinematicBg');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    function resize() {
+        width = canvas.width = canvas.offsetWidth;
+        height = canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const particles = [];
+    const numParticles = 80;
+    
+    for (let i = 0; i < numParticles; i++) {
+        particles.push({
+            x: Math.random() * width,
+            y: Math.random() * height,
+            radius: Math.random() * 1.5 + 0.5,
+            vx: (Math.random() - 0.5) * 0.2,
+            vy: (Math.random() - 0.5) * 0.2,
+            alpha: Math.random() * 0.5 + 0.1
+        });
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw subtle gradient
+        const gradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/1.5);
+        gradient.addColorStop(0, 'rgba(255,255,255,0.03)');
+        gradient.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            if (p.x < 0 || p.x > width) p.vx *= -1;
+            if (p.y < 0 || p.y > height) p.vy *= -1;
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+            ctx.fill();
+        });
+
+        // Draw connections
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 100) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initCinematicBg();
+});
+
 // ── UI HELPERS ────────────────────────────────────────
 function showToast(msg) {
     const t = document.createElement('div');
@@ -618,8 +768,27 @@ function showToast(msg) {
 // ── SIDEBAR TOGGLE ────────────────────────────────────
 $('toggleSidebar').onclick = () => {
     const sp = $('sidePanel');
-    if (window.innerWidth <= 1024) sp.classList.toggle('open');
-    else sp.classList.toggle('closed');
+    const overlay = $('sidebarOverlay');
+    if (window.innerWidth <= 1024) {
+        const isOpen = sp.classList.toggle('open');
+        if (overlay) overlay.classList.toggle('active', isOpen);
+    } else {
+        sp.classList.toggle('closed');
+    }
+};
+// Overlay click to close sidebar
+const sidebarOvEl = $('sidebarOverlay');
+if (sidebarOvEl) {
+    sidebarOvEl.onclick = () => {
+        $('sidePanel').classList.remove('open');
+        sidebarOvEl.classList.remove('active');
+    };
+}
+document.querySelector('.chat-viewport').onclick = (e) => {
+    if (window.innerWidth <= 1024 && !e.target.closest('#toggleSidebar') && !e.target.closest('.side-panel')) {
+        $('sidePanel').classList.remove('open');
+        if ($('sidebarOverlay')) $('sidebarOverlay').classList.remove('active');
+    }
 };
 
 // ── AUTO AGENT SWITCHER ───────────────────────────────
@@ -755,8 +924,14 @@ async function sendMessage() {
     if (welcome) welcome.remove();
 
     let userDisplay = text;
-    if (attachedFile) userDisplay += '\n*[Attached File]*';
-    if (isWebSearch) userDisplay += '\n*[Web Search ON]*';
+    if (attachedFile) {
+        if (attachedFile.startsWith('data:image')) {
+            userDisplay = `<img src="${attachedFile}" style="max-width:100%; max-height:250px; border-radius:10px; margin-bottom:12px; display:block; border:1px solid rgba(255,255,255,0.1); box-shadow:0 4px 12px rgba(0,0,0,0.1);">` + userDisplay;
+        } else {
+            userDisplay += `\n\n📄 **[Attached File: ${fileNameEl.textContent}]**`;
+        }
+    }
+    if (isWebSearch) userDisplay += '\n\n🔍 *[Live Web Search Enabled]*';
     appendMessage('You', userDisplay, 'user-wrap');
     inputEl.value = '';
     inputEl.style.height = 'auto';
@@ -765,8 +940,19 @@ async function sendMessage() {
     fileInput.value = '';
     filePreview.style.display = 'none';
 
-    const botWrap = appendMessage('AryaX', '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>');
+    // Show shimmer loading placeholder
+    const shimmerEl = document.createElement('div');
+    shimmerEl.className = 'luxury-shimmer-container';
+    shimmerEl.id = 'activeShimmer';
+    shimmerEl.innerHTML = `
+        <div class="luxury-shimmer-line"></div>
+    `;
+    chatArea.appendChild(shimmerEl);
+    chatArea.scrollTop = chatArea.scrollHeight;
+
+    const botWrap = appendMessage('AryaX', '');
     const botText = botWrap.querySelector('.msg');
+    botWrap.style.display = 'none';
 
     try {
         const mode = modeEl.value;
@@ -776,6 +962,10 @@ async function sendMessage() {
             body: JSON.stringify({ message: text, username: currentUser, sessionId: currentChatId, mode, file: payloadFile, webSearch: isWebSearch, sandbox: isCodeSandbox })
         });
         const reader = r.body.getReader(), decoder = new TextDecoder();
+        // Remove shimmer, show bot message
+        const shim = document.getElementById('activeShimmer');
+        if (shim) shim.remove();
+        botWrap.style.display = '';
         botText.innerHTML = '';
         let fullReply = '';
 
@@ -791,64 +981,70 @@ async function sendMessage() {
                     const json = JSON.parse(raw);
                     if (json.text) {
                         fullReply += json.text;
-                        let display = fullReply;
+                        if (!window.renderPending) {
+                            window.renderPending = true;
+                            requestAnimationFrame(() => {
+                                let display = fullReply;
 
-                        // Charts
-                        if (display.includes('[CHART:')) {
-                            display = display.replace(/\[CHART: (.*?)\]/g, (_, p) =>
-                                `<div class="chart-box"><canvas class="aryax-chart" data-config='${p}'></canvas></div>`);
-                        }
-                        // Files
-                        if (display.includes('[FILE:')) {
-                            display = display.replace(/\[FILE: (.*?), (.*?)\]/g, (_, name, content) =>
-                                `<a href="#" class="download-pill" onclick="downloadFile('${name}','${content}')">⬇ Download ${name}</a>`);
-                        }
-                        // PDF
-                        if (display.includes('[PDF:')) {
-                            display = display.replace(/\[PDF: (.*?), (.*?)\]/g, (_, title, content) =>
-                                `<a href="#" class="download-pill" onclick="generatePDF('${title}','${content}')">📄 Download PDF Report</a>`);
-                        }
-
-                        botText.innerHTML = marked.parse(display);
-
-                        // Charts init
-                        botText.querySelectorAll('.aryax-chart').forEach(c => {
-                            if (!c.chartInitialized) {
-                                try { new Chart(c, JSON.parse(c.getAttribute('data-config'))); c.chartInitialized = true; } catch {}
-                            }
-                        });
-
-                        // Syntax highlight + Python run button
-                        if (window.hljs) {
-                            botText.querySelectorAll('pre code').forEach(block => {
-                                hljs.highlightElement(block);
-                                if ((block.className.includes('python')) && !block.parentElement.querySelector('.run-btn')) {
-                                    const pre = block.parentElement;
-                                    pre.style.position = 'relative';
-                                    const rb = document.createElement('button');
-                                    rb.className = 'pill-btn run-btn';
-                                    rb.style.cssText = 'position:absolute;top:10px;right:10px;padding:4px 12px;font-size:11px;';
-                                    rb.innerHTML = '▶ Run';
-                                    pre.appendChild(rb);
-                                    const out = document.createElement('div');
-                                    out.style.cssText = 'display:none;margin-top:8px;padding:12px;background:rgba(0,0,0,.6);color:#e0e0e0;border-radius:10px;font-family:monospace;font-size:13px;border:1px solid rgba(255,255,255,.08);';
-                                    pre.after(out);
-                                    rb.onclick = async () => {
-                                        out.style.display = 'block';
-                                        out.textContent = 'Initializing sandbox...';
-                                        if (!window.pyodideInstance) {
-                                            try { window.pyodideInstance = await loadPyodide(); }
-                                            catch (e) { out.innerHTML = `<span style="color:#ff6b6b">Error: ${e}</span>`; return; }
-                                        }
-                                        out.textContent = 'Running...';
-                                        try {
-                                            await window.pyodideInstance.runPythonAsync('import sys,io;sys.stdout=io.StringIO()');
-                                            await window.pyodideInstance.runPythonAsync(block.innerText);
-                                            const stdout = window.pyodideInstance.runPython('sys.stdout.getvalue()');
-                                            out.innerHTML = stdout ? stdout.replace(/\n/g, '<br>') : '<i>Done (no output)</i>';
-                                        } catch (e) { out.innerHTML = `<span style="color:#ff6b6b">${e}</span>`; }
-                                    };
+                                // Charts
+                                if (display.includes('[CHART:')) {
+                                    display = display.replace(/\[CHART: (.*?)\]/g, (_, p) =>
+                                        `<div class="chart-box"><canvas class="aryax-chart" data-config='${p}'></canvas></div>`);
                                 }
+                                // Files
+                                if (display.includes('[FILE:')) {
+                                    display = display.replace(/\[FILE: (.*?), (.*?)\]/g, (_, name, content) =>
+                                        `<a href="#" class="download-pill" onclick="downloadFile('${name}','${content}')">⬇ Download ${name}</a>`);
+                                }
+                                // PDF
+                                if (display.includes('[PDF:')) {
+                                    display = display.replace(/\[PDF: (.*?), (.*?)\]/g, (_, title, content) =>
+                                        `<a href="#" class="download-pill" onclick="generatePDF('${title}','${content}')">📄 Download PDF Report</a>`);
+                                }
+
+                                botText.innerHTML = marked.parse(display);
+
+                                botText.querySelectorAll('.aryax-chart').forEach(c => {
+                                    if (!c.chartInitialized) {
+                                        try { new Chart(c, JSON.parse(c.getAttribute('data-config'))); c.chartInitialized = true; } catch {}
+                                    }
+                                });
+
+                                // Syntax highlight + Python run button
+                                if (window.hljs) {
+                                    botText.querySelectorAll('pre code').forEach(block => {
+                                        hljs.highlightElement(block);
+                                        if ((block.className.includes('python')) && !block.parentElement.querySelector('.run-btn')) {
+                                            const pre = block.parentElement;
+                                            pre.style.position = 'relative';
+                                            const rb = document.createElement('button');
+                                            rb.className = 'pill-btn run-btn';
+                                            rb.style.cssText = 'position:absolute;top:10px;right:10px;padding:4px 12px;font-size:11px;';
+                                            rb.innerHTML = '▶ Run';
+                                            pre.appendChild(rb);
+                                            const out = document.createElement('div');
+                                            out.style.cssText = 'display:none;margin-top:8px;padding:12px;background:rgba(0,0,0,.6);color:#e0e0e0;border-radius:10px;font-family:monospace;font-size:13px;border:1px solid rgba(255,255,255,.08);';
+                                            pre.after(out);
+                                            rb.onclick = async () => {
+                                                out.style.display = 'block';
+                                                out.textContent = 'Initializing sandbox...';
+                                                if (!window.pyodideInstance) {
+                                                    try { window.pyodideInstance = await loadPyodide(); }
+                                                    catch (e) { out.innerHTML = `<span style="color:#ff6b6b">Error: ${e}</span>`; return; }
+                                                }
+                                                out.textContent = 'Running...';
+                                                try {
+                                                    await window.pyodideInstance.runPythonAsync('import sys,io;sys.stdout=io.StringIO()');
+                                                    await window.pyodideInstance.runPythonAsync(block.innerText);
+                                                    const stdout = window.pyodideInstance.runPython('sys.stdout.getvalue()');
+                                                    out.innerHTML = stdout ? stdout.replace(/\n/g, '<br>') : '<i>Done (no output)</i>';
+                                                } catch (e) { out.innerHTML = `<span style="color:#ff6b6b">${e}</span>`; }
+                                            };
+                                        }
+                                    });
+                                }
+                                chatBox.scrollTop = chatBox.scrollHeight;
+                                window.renderPending = false;
                             });
                         }
                     }
@@ -868,6 +1064,9 @@ async function sendMessage() {
 
         saveHistory(text, fullReply);
     } catch (e) {
+        const shimErr = document.getElementById('activeShimmer');
+        if (shimErr) shimErr.remove();
+        botWrap.style.display = '';
         botText.textContent = 'Connection lost. Please try again.';
     }
 }
@@ -973,20 +1172,22 @@ inputEl.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey)
 (async () => {
     const saved = localStorage.getItem('aryax-user');
     if (saved) {
+        // Start fetch immediately so network isn't delayed by intro
+        const fetchPromise = fetch(`/api/credits?username=${saved}`).then(r => {
+            if (!r.ok) throw new Error('Auth failed');
+            return r.json();
+        }).catch(() => null);
+
         // Wait for intro to fully complete (4s fade + 1s opacity + buffer)
         setTimeout(async () => {
-            try {
-                const r = await fetch(`/api/credits?username=${saved}`);
-                const d = await r.json();
-                if (r.ok) {
-                    loginSuccess(saved, d.credits);
-                    checkBroadcast();
-                    setInterval(checkBroadcast, 60000); // Check every minute
-                } else {
-                    localStorage.removeItem('aryax-user');
-                    showAuth();
-                }
-            } catch {
+            const d = await fetchPromise;
+            if (d) {
+                loginSuccess(saved, d.credits, localStorage.getItem("aryax-token"));
+                checkBroadcast();
+                setInterval(checkBroadcast, 60000); // Check every minute
+            } else {
+                localStorage.removeItem('aryax-user');
+    localStorage.removeItem('aryax-token');
                 showAuth();
             }
         }, 5500);
@@ -1323,78 +1524,7 @@ function runStudioProject() {
     frame.close();
 }
 
-// ── NEURAL VOICE V2 ───────────────────────────────────
-class NeuralVoiceEngine {
-    constructor() {
-        this.recognition = SR ? new SR() : null;
-        if (this.recognition) {
-            this.recognition.continuous = true;
-            this.recognition.interimResults = false;
-            this.recognition.onresult = (e) => this.handleResult(e);
-            this.recognition.onend = () => { if (this.active) this.recognition.start(); };
-        }
-        this.active = false;
-        this.silenceTimer = null;
-    }
-
-    toggle() {
-        if (!SR) return alert('Speech recognition not supported in this browser.');
-        this.active = !this.active;
-        if (this.active) {
-            this.recognition.start();
-            $('voiceStatus').style.display = 'block';
-            micBtn.classList.add('active');
-            showAgentToast('Neural Voice');
-        } else {
-            this.active = false;
-            this.recognition.stop();
-            $('voiceStatus').style.display = 'none';
-            micBtn.classList.remove('active');
-            window.speechSynthesis.cancel();
-        }
-    }
-
-    handleResult(e) {
-        if (!this.active) return;
-        const last = e.results[e.results.length - 1][0].transcript.trim();
-        if (!last) return;
-        
-        inputEl.value = last;
-        clearTimeout(this.silenceTimer);
-        this.silenceTimer = setTimeout(() => {
-            if (inputEl.value.trim() && this.active) sendMessage();
-        }, 1500);
-    }
-
-    speak(text) {
-        if (!this.active || !('speechSynthesis' in window)) return;
-        window.speechSynthesis.cancel();
-        const msg = new SpeechSynthesisUtterance(text.replace(/[*#`]/g, ''));
-        msg.onstart = () => { 
-            if (this.recognition) try { this.recognition.stop(); } catch(e){}
-            if ($('voiceOrb')) $('voiceOrb').style.display = 'flex'; 
-        };
-        msg.onend = () => { 
-            if ($('voiceOrb')) $('voiceOrb').style.display = 'none';
-            if (this.active && this.recognition) try { this.recognition.start(); } catch(e){}
-        };
-        window.speechSynthesis.speak(msg);
-    }
-}
-
-const NeuralVoice = new NeuralVoiceEngine();
-if (micBtn) micBtn.onclick = () => NeuralVoice.toggle();
-
-// Override appendMessage to trigger Neural Voice speech
-const _origAppendMessage = appendMessage;
-appendMessage = function(role, text, wrapClass) {
-    const wrap = _origAppendMessage(role, text, wrapClass);
-    if (role === 'AryaX' && NeuralVoice.active) {
-        NeuralVoice.speak(text);
-    }
-    return wrap;
-};
-
+// Removed duplicate NeuralVoiceEngine, relying on voiceASI and Whisper integration.
 // ── NEURAL AVATAR LOGIC ──────────────────────────────
 function setAvatarSpeaking(isSpeaking) {
     const avatar = $('neuralAvatar');
@@ -2419,4 +2549,80 @@ async function deleteMemoryKey(key) {
     } catch { showToast('Failed to delete memory'); }
 }
 
+
+
+// -- RAZORPAY INTEGRATION --------------------------------
+async function upgradeToPro() {
+    if (!currentUser) return alert('Please login first.');
+    const btn = document.getElementById('upgradeBtn');
+    btn.textContent = 'Processing...';
+    btn.disabled = true;
+
+    try {
+        const r = await fetch('/api/payment/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ amount: 999 })
+        });
+        const orderData = await r.json();
+
+        if (!orderData.ok) {
+            alert('Failed to initialize payment.');
+            btn.textContent = 'Upgrade Now - .99/mo';
+            btn.disabled = false;
+            return;
+        }
+
+        var options = {
+            'key': 'rzp_test_dummy',
+            'amount': orderData.amount * 100,
+            'currency': orderData.currency,
+            'name': 'AryaX ASI',
+            'description': 'AryaX Pro Subscription',
+            'image': 'https://upload.wikimedia.org/wikipedia/commons/4/42/Apple_Intelligence.png',
+            'order_id': orderData.order_id,
+            'handler': async function (response) {
+                const vr = await fetch('/api/payment/verify', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: currentUser,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_signature: response.razorpay_signature
+                    })
+                });
+                const vData = await vr.json();
+                if (vData.ok) {
+                    alert('Payment Successful! Welcome to AryaX PRO.');
+                    document.getElementById('pricingModal').style.display = 'none';
+                    btn.textContent = 'Upgrade Now - .99/mo';
+                    btn.disabled = false;
+                    loginSuccess(currentUser, 999999);
+                } else {
+                    alert('Payment verification failed.');
+                }
+            },
+            'prefill': {
+                'name': currentUser,
+            },
+            'theme': {
+                'color': '#a855f7'
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+                alert('Payment Failed: ' + response.error.description);
+                btn.textContent = 'Upgrade Now - .99/mo';
+                btn.disabled = false;
+        });
+        rzp1.open();
+
+    } catch (e) {
+        console.error(e);
+        alert('Error initiating checkout.');
+        btn.textContent = 'Upgrade Now - .99/mo';
+        btn.disabled = false;
+    }
+}
 

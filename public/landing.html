@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AryaX | Artificial Super Intelligence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;900&family=Space+Grotesk:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #010103;
+            --accent: #a855f7;
+            --accent-glow: rgba(168, 85, 247, 0.4);
+            --text: #ffffff;
+            --muted: rgba(255, 255, 255, 0.6);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* DYNAMIC BACKGROUND */
+        .bg-glow {
+            position: absolute;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80vw;
+            height: 80vw;
+            background: radial-gradient(circle, rgba(168,85,247,0.15) 0%, rgba(99,102,241,0.05) 50%, transparent 70%);
+            filter: blur(100px);
+            z-index: -1;
+            animation: pulseBg 10s infinite alternate;
+        }
+        @keyframes pulseBg {
+            0% { transform: translateX(-50%) scale(1); opacity: 0.8; }
+            100% { transform: translateX(-50%) scale(1.1); opacity: 1; }
+        }
+
+        /* NAVBAR */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 900;
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links a { color: var(--muted); text-decoration: none; font-weight: 500; transition: 0.3s; }
+        .nav-links a:hover { color: #fff; }
+        .btn-primary {
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 10px 20px var(--accent-glow);
+            transition: 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px var(--accent-glow);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+        /* HERO SECTION */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 150px 20px 100px;
+            position: relative;
+        }
+        .hero-badge {
+            background: rgba(168,85,247,0.1);
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            border: 1px solid var(--accent-glow);
+            display: inline-block;
+        }
+        h1 {
+            font-size: 80px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 30px;
+            max-width: 900px;
+            background: linear-gradient(to right, #fff, #a855f7, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 200% auto;
+            animation: shine 5s linear infinite;
+        }
+        @keyframes shine { to { background-position: 200% center; } }
+        .hero p {
+            font-size: 22px;
+            color: var(--muted);
+            max-width: 600px;
+            margin-bottom: 50px;
+        }
+        .hero-btns {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* FEATURES SECTION */
+        .features {
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .features-header { text-align: center; margin-bottom: 80px; }
+        .features-header h2 { font-size: 48px; margin-bottom: 20px; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+        .feature-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 40px;
+            border-radius: 24px;
+            transition: 0.4s;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: rgba(255,255,255,0.05);
+            border-color: var(--accent-glow);
+        }
+        .f-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+        .feature-card h3 { font-size: 24px; margin-bottom: 15px; }
+        .feature-card p { color: var(--muted); }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding: 50px;
+            text-align: center;
+            color: var(--muted);
+            margin-top: 100px;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 48px; }
+            .grid { grid-template-columns: 1fr; }
+            nav { padding: 20px; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <nav>
+        <div class="logo">
+            <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
+                <rect width="100" height="100" rx="20" fill="url(#grad)"/>
+                <path d="M50 20L20 80H40L50 55L60 80H80L50 20Z" fill="white"/>
+                <defs>
+                    <linearGradient id="grad" x1="0" y1="0" x2="100" y2="100">
+                        <stop offset="0%" stop-color="#a855f7"/>
+                        <stop offset="100%" stop-color="#6366f1"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+            AryaX
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#vision">Vision</a>
+            <a href="/admin-portal/">Admin</a>
+        </div>
+        <a href="/app" class="btn-primary">Launch App</a>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-badge">AryaX V3 is now live ✨</div>
+        <h1>The World's Most Advanced AI Workspace</h1>
+        <p>Experience true artificial super intelligence. Multimodal vision, autonomous agents, neural voice, and integrated business tools.</p>
+        <div class="hero-btns">
+            <a href="/app" class="btn-primary" style="padding: 16px 32px; font-size: 18px;">Start Free Trial</a>
+            <a href="#features" class="btn-secondary" style="padding: 16px 32px; font-size: 18px;">Discover Features</a>
+        </div>
+        
+        <img src="https://media.discordapp.net/attachments/111/111/mockup.png" style="width:100%; max-width:1000px; margin-top:80px; border-radius:16px; border:1px solid rgba(255,255,255,0.1); box-shadow: 0 30px 100px rgba(0,0,0,0.8);" alt="App Interface" onerror="this.style.display='none'">
+    </section>
+
+    <section id="features" class="features">
+        <div class="features-header">
+            <h2>Beyond ChatGPT</h2>
+            <p style="color:var(--muted); font-size:20px;">Built for creators, developers, and businesses.</p>
+        </div>
+        
+        <div class="grid">
+            <div class="feature-card">
+                <div class="f-icon">🎙️</div>
+                <h3>Neural Voice</h3>
+                <p>Talk to AryaX naturally with real-time speech recognition and lifelike text-to-speech output. Wake word "Hey Arya" supported.</p>
+            </div>
+            <div class="feature-card">
+                <div class="f-icon">🤖</div>
+                <h3>Autonomous Agent</h3>
+                <p>Give it a goal. AryaX will think, search the live web, and execute complex multi-step tasks entirely on its own.</p>
+            </div>
+            <div class="feature-card">
+                <div class="f-icon">💻</div>
+                <h3>AryaX Studio</h3>
+                <p>A built-in coding environment. Code HTML/JS and see live previews without leaving your chat window.</p>
+            </div>
+            <div class="feature-card">
+                <div class="f-icon">🇮🇳</div>
+                <h3>India Business Tools</h3>
+                <p>Generate ATS resumes, calculate GST, build custom invoices, and translate regional languages instantly.</p>
+            </div>
+            <div class="feature-card">
+                <div class="f-icon">👁️</div>
+                <h3>Multimodal Vision</h3>
+                <p>Upload images, diagrams, or PDFs. AryaX sees the world as you do, using advanced Gemini Vision capabilities.</p>
+            </div>
+            <div class="feature-card">
+                <div class="f-icon">💾</div>
+                <h3>Persistent Memory</h3>
+                <p>Teach AryaX your preferences. It remembers your name, your business details, and context across all your future sessions.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 AryaX Artificial Super Intelligence. Built with absolute perfection.</p>
+    </footer>
+
+</body>
+</html>

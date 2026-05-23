@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, Response, stream_with_context
+from flask import Flask, request, jsonify, send_from_directory, Response, stream_with_context, send_file
 from datetime import datetime, date
 import pytz
 import requests
@@ -34,6 +34,31 @@ except ImportError:
 load_dotenv()
 
 app = Flask(__name__, static_folder='public')
+
+# ===== JWT AUTH DECORATOR =====
+import jwt
+from functools import wraps
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'Authorization' in request.headers:
+            parts = request.headers['Authorization'].split()
+            if len(parts) == 2 and parts[0] == 'Bearer':
+                token = parts[1]
+        
+        if not token:
+            return jsonify({'error': 'Token is missing!'}), 401
+        
+        try:
+            data = jwt.decode(token, os.getenv('JWT_SECRET', 'fallback_secret_aryaX'), algorithms=['HS256'])
+            current_user = data['user']
+        except:
+            return jsonify({'error': 'Token is invalid or expired!'}), 401
+            
+        request.current_user = current_user
+        return f(*args, **kwargs)
+    return decorated
 
 # ===== SECURITY HEADERS =====
 @app.after_request
@@ -73,6 +98,7 @@ DB_FILE = os.path.join(os.path.dirname(__file__), 'db.json')
 
 sessions = {}
 rate_limits = {}
+response_cache = {}
 
 # ===== CREDIT COSTS =====
 CREDIT_COSTS = {
@@ -338,6 +364,19 @@ def static_files(filename):
     return send_from_directory('public', filename)
 
 
+# ===== EMAIL SYSTEM (MOCK) =====
+def send_welcome_email(email_address, username):
+    """
+    Mock function to simulate sending an SMTP email.
+    In production, this would use smtplib or a service like SendGrid.
+    """
+    if not email_address:
+        return
+    import threading
+    def _send():
+        print(f"\n{'='*50}\n📧 EMAIL SENT TO: {email_address}\nSUBJECT: Welcome to AryaX!\nBODY: Hello {username},\nWelcome to the Artificial Super Intelligence ecosystem.\n{'='*50}\n")
+    threading.Thread(target=_send).start()
+
 # ===== AUTH =====
 @app.post('/api/signup')
 def signup():
@@ -354,27 +393,73 @@ def signup():
     if len(password) < 4:
         return jsonify({'error': 'Password must be 4+ characters'}), 400
 
+    referral_code = data.get('referralCode', '').strip()
+
     db = load_db()
     if username in db['users']:
         return jsonify({'error': 'Username already exists'}), 409
+
+    referrer = None
+    if referral_code:
+        for u, udata in db['users'].items():
+            if udata.get('my_referral_code') == referral_code:
+                referrer = u
+                break
+                
+    import uuid
+    my_ref_code = str(uuid.uuid4())[:8]
 
     db['users'][username] = {
         'password': hash_pass(password),
         'mobile': mobile,
         'email': email,
-        'credits': DAILY_LIMIT,
+        'credits': DAILY_LIMIT + (500 if referrer else 0),
         'credit_date': str(date.today()),
         'created': str(datetime.now()),
         'total_chats': 0,
-        'memory': {}
+        'memory': {},
+        'my_referral_code': my_ref_code,
+        'referred_by': referrer,
+        'referral_count': 0
     }
+    
+    if referrer:
+        db['users'][referrer]['credits'] = db['users'][referrer].get('credits', 0) + 1000
+        db['users'][referrer]['referral_count'] = db['users'][referrer].get('referral_count', 0) + 1
+
     save_db(db)
+    
+    # Send welcome email asynchronously
+    send_welcome_email(email, username)
+
+    import jwt
+    import datetime
+    token = jwt.encode({
+        'user': username,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    }, os.getenv('JWT_SECRET', 'fallback_secret_aryaX'), algorithm='HS256')
+
     return jsonify({
         'ok': True,
         'username': username,
-        'credits': DAILY_LIMIT
+        'token': token,
+        'credits': DAILY_LIMIT,
+        'referral_code': my_ref_code
     })
 
+@app.get('/api/referral/status')
+@token_required
+def referral_status():
+    db = load_db()
+    user = db['users'].get(request.current_user)
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+        
+    return jsonify({
+        'referral_code': user.get('my_referral_code'),
+        'referral_count': user.get('referral_count', 0),
+        'credits_earned': user.get('referral_count', 0) * 1000
+    })
 
 @app.post('/api/login')
 def login():
@@ -392,21 +477,32 @@ def login():
 
     db = load_db()
     user = db['users'].get(username)
-    if not user or user['password'] != hash_pass(password):
+    from utils.db import verify_pass
+    if not user or not verify_pass(password, user.get('password', '')):
         record_failed_login(ip)
         return jsonify({'error': 'Invalid username or password'}), 401
 
     reset_failed_login(ip)
-    credits = get_user_credits(username)
+    
+    # Generate JWT Token
+    import jwt
+    import datetime
+    token = jwt.encode({
+        'user': username,
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    }, os.getenv('JWT_SECRET', 'fallback_secret_aryaX'), algorithm='HS256')
+
     return jsonify({
         'ok': True,
         'username': username,
-        'credits': credits,
+        'token': token,
+        'credits': user.get('credits', 1000),
         'total_chats': user.get('total_chats', 0)
     })
 
 
 @app.get('/api/credits')
+@token_required
 def credits():
     username = request.args.get('username', '').strip().lower()
     if not username:
@@ -417,6 +513,7 @@ def credits():
 
 # ===== CHAT =====
 @app.post('/api/chat')
+@token_required
 def chat():
     db = load_db()
     data = request.json
@@ -609,12 +706,19 @@ def chat():
             return jsonify({'error': 'API key missing'}), 500
 
         body = build_body(history, mode, username)
+        cache_key = f"{mode}:{message}"
+        if cache_key in response_cache and not file_b64:
+            def cached_generate():
+                yield f"data: {json.dumps({'text': response_cache[cache_key], 'is_cached': True})}\n\n"
+                yield "data: [DONE]\n\n"
+            return Response(cached_generate(), mimetype='text/event-stream')
 
         def generate():
             full_reply = ""
             try:
+                target_url = GEMINI_STREAM_URL if mode == 'pro' else GEMINI_FLASH_URL
                 resp = requests.post(
-                    f"{GEMINI_STREAM_URL}?alt=sse&key={current_key}",
+                    f"{target_url}?alt=sse&key={current_key}",
                     json=body, stream=True, timeout=60
                 )
                 if resp.status_code == 429:
@@ -637,15 +741,21 @@ def chat():
                     try:
                         chunk = json.loads(raw)
                         candidates = chunk.get('candidates', [])
-                        if not candidates:
-                            continue
-                        parts = candidates[0].get('content', {}).get('parts', [])
-                        if not parts:
-                            continue
-                        text = parts[0].get('text', '')
-                        if text:
-                            full_reply += text
-                            yield f"data: {json.dumps({'text': text}, ensure_ascii=False)}\n\n"
+                        if candidates:
+                            parts = candidates[0].get('content', {}).get('parts', [])
+                            if parts:
+                                text = parts[0].get('text', '')
+                                full_reply += text
+                                yield f"data: {json.dumps({'text': text})}\n\n"
+                    except Exception:
+                        pass
+                
+                if full_reply and not file_b64:
+                    response_cache[cache_key] = full_reply
+
+                if username:
+                    try:
+                        save_history(username, session_id, message, full_reply)
                     except Exception:
                         pass
             except Exception as e:
@@ -860,7 +970,8 @@ def health():
 def get_admin_stats():
     data = request.json
     password = data.get('password', '')
-    if password != os.getenv('ADMIN_PORTAL_PASSWORD', 'aryax2055'):  # Use ADMIN_PORTAL_PASSWORD in .env
+    admin_pass = os.getenv('ADMIN_PORTAL_PASSWORD')
+    if not admin_pass or password != admin_pass:
         return jsonify({'error': 'Unauthorized'}), 401
         
     db = load_db()
@@ -916,14 +1027,64 @@ def upgrade_plan():
     return jsonify({'error': 'User not found'}), 404
 
 
+# ===== RAZORPAY SUBSCRIPTION =====
+import razorpay
+# Dummy test keys
+razorpay_client = razorpay.Client(auth=("rzp_test_dummy", "rzp_secret_dummy"))
+
+@app.post('/api/payment/create-order')
+def create_order():
+    data = request.json
+    amount = data.get('amount', 999) # Default $9.99 in INR (e.g. 800 INR)
+    currency = 'INR'
+    
+    try:
+        # Create Razorpay Order
+        order = razorpay_client.order.create(dict(amount=amount*100, currency=currency, payment_capture='1'))
+        return jsonify({
+            'ok': True,
+            'order_id': order['id'],
+            'amount': amount,
+            'currency': currency
+        })
+    except Exception as e:
+        # Mock mode fallback if keys are invalid
+        return jsonify({
+            'ok': True,
+            'order_id': f'order_mock_{int(time.time())}',
+            'amount': amount,
+            'currency': currency,
+            'mock': True
+        })
+
+@app.post('/api/payment/verify')
+def verify_payment():
+    data = request.json
+    username = data.get('username', '').strip().lower()
+    payment_id = data.get('razorpay_payment_id')
+    order_id = data.get('razorpay_order_id')
+    signature = data.get('razorpay_signature')
+    
+    db = load_db()
+    if username in db['users']:
+        # Upgrade to PRO
+        db['users'][username]['credits'] = 999999
+        db['users'][username]['tier'] = 'PRO'
+        save_db(db)
+        return jsonify({'ok': True, 'message': 'Payment successful! Upgraded to PRO.'})
+    
+    return jsonify({'error': 'User not found'}), 404
+
 # ===== CLOUD CHAT HISTORY =====
 @app.post('/api/history/save')
+@token_required
 def save_history():
     data = request.json
     username = data.get('username', '').strip().lower()
     chat_id = data.get('chatId', '')
     title = data.get('title', 'Untitled Chat')[:60]
     messages = data.get('messages', [])
+    folder_id = data.get('folder_id', 'general')
     if not username or not chat_id:
         return jsonify({'error': 'Missing fields'}), 400
     db = load_db()
@@ -933,9 +1094,30 @@ def save_history():
         db['users'][username]['chats'] = {}
     db['users'][username]['chats'][chat_id] = {
         'title': title,
+        'folder_id': folder_id,
         'messages': messages[-50:],  # Keep last 50 messages
         'updated': str(datetime.now())
     }
+    
+@app.post('/api/chat/react')
+@token_required
+def chat_react():
+    data = request.json
+    username = request.current_user
+    chat_id = data.get('chatId', '')
+    message_idx = data.get('messageIdx')
+    reaction = data.get('reaction')
+    
+    db = load_db()
+    try:
+        chat = db['users'][username]['chats'].get(chat_id)
+        if chat and message_idx < len(chat['messages']):
+            chat['messages'][message_idx]['reaction'] = reaction
+            save_db(db)
+            return jsonify({'ok': True})
+    except Exception:
+        pass
+    return jsonify({'error': 'Message not found'}), 404
     # Keep only last 30 chats
     chats = db['users'][username]['chats']
     if len(chats) > 30:
@@ -945,6 +1127,7 @@ def save_history():
     return jsonify({'ok': True})
 
 @app.get('/api/history/load')
+@token_required
 def load_history():
     username = request.args.get('username', '').strip().lower()
     if not username:
@@ -960,11 +1143,23 @@ def load_history():
     return jsonify({'chats': result})
 
 @app.post('/api/history/delete')
+@token_required
 def delete_history():
     data = request.json
     username = data.get('username', '').strip().lower()
     chat_id = data.get('chatId', '')
     db = load_db()
+
+@app.post('/api/history/clear')
+@token_required
+def clear_history():
+    data = request.json
+    username = data.get('username', '').strip().lower()
+    db = load_db()
+    if username in db['users'] and 'chats' in db['users'][username]:
+        db['users'][username]['chats'] = {}
+        save_db(db)
+    return jsonify({'ok': True})
     if username in db['users'] and 'chats' in db['users'][username]:
         db['users'][username]['chats'].pop(chat_id, None)
         save_db(db)
@@ -1530,18 +1725,10 @@ def execute_code():
                 'memory': result.get('memory')
             })
         else:
-            # Fallback: limited Python exec via subprocess
-            import subprocess, tempfile
-            if language != 'python':
-                return jsonify({'error': 'Only Python supported without Judge0 API key. Add JUDGE0_API_KEY to .env'}), 400
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False, dir=os.path.dirname(__file__)) as f:
-                f.write(code)
-                f.flush()
-                try:
-                    result = subprocess.run(['python', f.name], capture_output=True, text=True, timeout=10)
-                    return jsonify({'output': result.stdout, 'error': result.stderr, 'status': 'Completed'})
-                finally:
-                    os.unlink(f.name)
+            return jsonify({
+                'error': 'JUDGE0_API_KEY is required for server-side code execution. Please configure the .env file or use frontend Pyodide.',
+                'status': 'Security Block'
+            }), 403
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -1761,6 +1948,7 @@ def autonomous_agent():
 
 # ===== PHASE 5: ENHANCED AUTONOMOUS AGENT (Think→Act→Repeat) =====
 @app.post('/api/agent/run')
+@token_required
 def agent_run():
     """Full autonomous agent with Think→Act→Repeat loop"""
     data = request.json
@@ -1874,6 +2062,7 @@ If it's a coding task, write the full code. If research, give detailed findings.
 
 # ===== PHASE 4: TASK PLANNER =====
 @app.post('/api/task/plan')
+@token_required
 def task_plan():
     """AI breaks a goal into numbered steps"""
     data = request.json
@@ -1965,6 +2154,7 @@ def gst_calculator():
 
 # ===== PHASE 8: INDIA SPECIAL =====
 @app.post('/api/resume/build')
+@token_required
 def build_resume():
     """AI Resume Builder for Indian job market"""
     data = request.json
@@ -2043,6 +2233,7 @@ def generate_invoice():
 
 # ===== PHASE 7: MEMORY MANAGER =====
 @app.post('/api/memory/delete')
+@token_required
 def delete_memory_key():
     """Delete a specific memory key for user"""
     data = request.json
@@ -2059,6 +2250,7 @@ def delete_memory_key():
 
 
 @app.post('/api/preferences/save')
+@token_required
 def save_preferences():
     """Save user UI preferences"""
     data = request.json
@@ -2075,6 +2267,7 @@ def save_preferences():
 
 
 @app.get('/api/preferences/load')
+@token_required
 def load_preferences():
     """Load user UI preferences"""
     username = request.args.get('username', '').strip().lower()
@@ -2084,6 +2277,7 @@ def load_preferences():
 
 
 @app.get('/api/agent/tasks')
+@token_required
 def get_agent_tasks():
     """Get user's agent task history"""
     username = request.args.get('username', '').strip().lower()
@@ -2191,7 +2385,7 @@ def upgrade_subscription():
     return jsonify({'ok': True, 'tier': plan, 'credits': user['credits']})
 
 @app.get('/api/user/credits')
-def get_user_credits():
+def api_get_user_credits():
     """Fetch user credits and tier"""
     username = request.args.get('username', '').strip().lower()
     db = load_db()

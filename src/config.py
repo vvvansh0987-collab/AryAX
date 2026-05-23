@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     environment: str = "development"
     
     # Database
-    database_url: str = "postgresql+asyncpg://aryax:aryax_password@localhost:5432/aryax_db"
+    database_url: str = "sqlite+aiosqlite:///./aryax_db.db"
     database_pool_size: int = 20
     database_max_overflow: int = 10
     database_pool_pre_ping: bool = True
@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = "ignore"
 
 
 settings = Settings()

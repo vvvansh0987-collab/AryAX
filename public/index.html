@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="style.css?v=4.3">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
@@ -580,7 +581,7 @@
         <!-- 🧠 NEURAL THINKING FEED (B/W PROFESSIONAL) -->
         <div class="mode-container" style="margin-top:20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top:20px;">
             <div class="section-label" style="letter-spacing:2px; font-size:10px; opacity:0.6;">AUTONOMOUS CORE STREAM</div>
-            <div id="thinkingFeed" style="height:100px; font-family: 'Courier New', monospace; font-size:11px; color:rgba(255,255,255,0.7); overflow:hidden; display:flex; flex-direction:column-reverse; line-height:1.6; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px;">
+            <div id="thinkingFeed" style="height:100px; font-family: 'Courier New', monospace; font-size:11px; color:rgba(255,255,255,0.7); overflow:hidden; display:flex; flex-direction:column-reverse; line-height:1.6; background:rgba(0,0,0,0.2); padding:10px; border-radius:8px; user-select:none;">
                 <div class="feed-entry">> SYNCING NEURAL PATHWAYS...</div>
             </div>
         </div>
@@ -683,6 +684,9 @@
         </div>
     </aside>
 
+    <!-- SIDEBAR OVERLAY -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- MAIN CHAT -->
     <main class="chat-viewport">
         <header class="top-nav">
@@ -697,11 +701,64 @@
                         <path d="M50 18L16 80H36L50 52L64 80H84L50 18Z" fill="#000"/>
                         <rect x="31" y="62" width="38" height="6" rx="3" fill="#000"/>
                     </svg>
-                    <span id="modeLabel" class="mode-label" style="font-weight:700;color:var(--text);">AryaX · Smart Chat</span>
+                    <!-- Model Switcher Dropdown -->
+                    <div class="model-switcher" id="modelSwitcher">
+                        <button class="model-switcher-btn" id="modelSwitcherBtn">
+                            <span id="currentModelName">AryaX · Smart Chat</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                        </button>
+                        <div class="model-dropdown" id="modelDropdown">
+                            <div class="model-option selected" data-mode="chat" onclick="selectModel(this)">
+                                <div class="mo-check">✓</div>
+                                <div class="mo-info">
+                                    <div class="mo-name">Smart Chat <span class="mo-badge">Default</span></div>
+                                    <div class="mo-desc">All-around intelligent assistant</div>
+                                </div>
+                            </div>
+                            <div class="model-option" data-mode="code" onclick="selectModel(this)">
+                                <div class="mo-check">✓</div>
+                                <div class="mo-info">
+                                    <div class="mo-name">Code Master</div>
+                                    <div class="mo-desc">Expert coding & debugging</div>
+                                </div>
+                            </div>
+                            <div class="model-option" data-mode="webdev" onclick="selectModel(this)">
+                                <div class="mo-check">✓</div>
+                                <div class="mo-info">
+                                    <div class="mo-name">Web Dev</div>
+                                    <div class="mo-desc">HTML, CSS, JS & frameworks</div>
+                                </div>
+                            </div>
+                            <div class="model-option" data-mode="image" onclick="selectModel(this)">
+                                <div class="mo-check">✓</div>
+                                <div class="mo-info">
+                                    <div class="mo-name">Image Gen</div>
+                                    <div class="mo-desc">Create images from text</div>
+                                </div>
+                            </div>
+                            <div class="model-option" data-mode="elite" onclick="selectModel(this)">
+                                <div class="mo-check">✓</div>
+                                <div class="mo-info">
+                                    <div class="mo-name">Elite (GPT-4o) <span class="mo-badge">Pro</span></div>
+                                    <div class="mo-desc">Advanced reasoning & code</div>
+                                </div>
+                            </div>
+                            <div class="model-option" data-mode="researcher" onclick="selectModel(this)">
+                                <div class="mo-check">✓</div>
+                                <div class="mo-info">
+                                    <div class="mo-name">Agent: Researcher <span class="mo-badge">New</span></div>
+                                    <div class="mo-desc">Deep research & analysis</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="nav-right">
                 <span id="creditDisplay" class="credit-badge">10,000 Credits</span>
+                <button onclick="shareChat()" class="nav-icon-btn" title="Share Chat">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                </button>
                 <button onclick="openExportMenu()" class="nav-icon-btn" title="Export Chat (Ctrl+E)">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 </button>
@@ -710,48 +767,44 @@
         </header>
 
         <div id="chat" class="message-stream">
-            <div class="welcome-hero">
-                <div class="welcome-icon">
-                    <svg width="52" height="52" viewBox="0 0 100 100" fill="none">
-                        <rect width="100" height="100" rx="20" fill="rgba(255,255,255,0.08)"/>
-                        <path fill-rule="evenodd" d="M50,16 L15,84 H32 L39,63 H61 L68,84 H85 L50,16 Z M44,55 L50,30 L56,55 Z" fill="white"/>
-                    </svg>
-                </div>
-                <h1>How can I help you today?</h1>
-                <p>I am AryaX, your Artificial Super Intelligence. Ask me anything — from coding to creative writing, business to science.</p>
-                <div class="quick-actions">
-                    <button class="quick-btn" onclick="quickAsk('Write a Python web scraper')">Write Python Code</button>
-                    <button class="quick-btn" onclick="quickAsk('Create a business plan for my startup')">Business Plan</button>
-                    <button class="quick-btn" onclick="quickAsk('Generate an image of a futuristic city')">Generate Image</button>
-                    <button class="quick-btn" onclick="quickAsk('Explain quantum computing simply')">Explain a Concept</button>
-                    <button class="quick-btn" onclick="openAgentPanel()">Autonomous Agent</button>
-                    <button class="quick-btn" onclick="openIndiaTools()">India Tools</button>
+            <div class="welcome-hero luxury-hero">
+                <!-- Cinematic Background Canvas -->
+                <canvas id="cinematicBg" class="cinematic-canvas"></canvas>
+                
+                <div class="luxury-content">
+                    <div class="luxury-logo-wrap">
+                        <svg width="48" height="48" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="100" height="100" rx="0" fill="#fff"/>
+                            <path d="M50 18L16 80H36L50 52L64 80H84L50 18Z" fill="#000"/>
+                        </svg>
+                    </div>
+                    <div class="luxury-text-reveal">
+                        <h1 id="welcomeGreeting" class="luxury-greeting">INITIALIZING</h1>
+                        <p class="luxury-sub">ARYAX INTELLIGENCE SYSTEM</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <footer class="input-zone">
-            <div class="floating-pill">
+        <footer class="input-zone luxury-input-zone">
+            <div class="luxury-input-wrapper">
                 <div id="filePreview" class="file-preview-container" style="display:none;">
                     <span id="fileName" class="file-name"></span>
-                    <button id="removeFile" class="remove-file-btn">×</button>
+                    <button onclick="removeFile()" class="remove-file-btn">×</button>
                 </div>
-                <div class="input-wrapper">
-                    <button id="attachBtn" class="action-icon" title="Attach file">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+                <div class="luxury-input-inner">
+                    <button id="uploadBtn" class="action-icon minimal-btn" title="Upload">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
                     </button>
-                    <button id="imageBtn" class="action-icon" title="Generate image">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                    <button id="imageBtn" class="action-icon minimal-btn" title="Generate image">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="0"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                     </button>
                     <input type="file" id="fileInput" style="display:none;" accept="image/*,.pdf,.txt,.csv">
-                    <textarea id="input" placeholder="Message AryaX..." rows="1"></textarea>
+                    <textarea id="input" placeholder="Message AryaX..." rows="1" class="luxury-textarea"></textarea>
                     <div class="input-actions">
-                        <button id="micBtn" class="action-icon" title="Neural Voice Mode">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-                        </button>
                         <div id="voiceStatus" class="voice-status-pill" style="display:none;">Neural Voice Active</div>
                         <button id="send" class="send-pill" title="Send">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                         </button>
                     </div>
                 </div>
@@ -828,6 +881,16 @@
       <div class="profile-stat"><div class="num" id="statMsgs">0</div><div class="lbl">Messages</div></div>
       <div class="profile-stat"><div class="num" id="statCredits">0</div><div class="lbl">Credits</div></div>
       <div class="profile-stat"><div class="num" id="statChats">0</div><div class="lbl">Chats</div></div>
+    </div>
+    
+    <div style="margin-top:16px; background: rgba(0, 255, 128, 0.1); border: 1px solid rgba(0, 255, 128, 0.3); padding: 12px; border-radius: 8px;">
+      <div style="font-weight: 700; color: #00ff80; margin-bottom: 8px;">🚀 Refer & Earn</div>
+      <div style="font-size: 12px; margin-bottom: 8px;">Share this code to get 1000 free credits per referral!</div>
+      <div style="display: flex; gap: 8px;">
+        <input type="text" id="referralCodeDisplay" readonly style="flex:1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 4px 8px; border-radius: 4px;">
+        <button onclick="copyReferralCode()" style="background: #00ff80; color: #000; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-weight: bold;">Copy</button>
+      </div>
+      <div style="font-size: 11px; margin-top: 8px; color: var(--muted);" id="referralStats">Referred: 0 | Earned: 0</div>
     </div>
     <div style="margin-top:16px;">
       <div class="setting-row">
@@ -1359,6 +1422,15 @@
 #btnMusic { border-color: rgba(255, 255, 255, 0.1); }
 #btnMusic:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
 </style>
+<!-- PREVIEW PANEL -->
+<div id="previewPanel" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;flex-direction:column;">
+    <div style="padding:15px;background:#111;border-bottom:1px solid #333;display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-weight:700;color:#fff;">HTML Live Preview</span>
+        <button id="closePreview" style="background:none;border:none;color:#fff;font-size:24px;cursor:pointer;">&times;</button>
+    </div>
+    <iframe id="previewFrame" style="width:100%;flex:1;border:none;background:#fff;"></iframe>
+</div>
+
 <script src="script.js?v=4.3"></script>
 </body>
 </html>

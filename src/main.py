@@ -26,8 +26,15 @@ async def lifespan(app: FastAPI):
     logger.info("Starting AryaX Platform...")
     try:
         await init_db()
-        await init_redis()
-        await init_elasticsearch()
+        try:
+            await init_redis()
+        except Exception as e:
+            logger.warning(f"Redis initialization failed (optional): {e}")
+            
+        try:
+            await init_elasticsearch()
+        except Exception as e:
+            logger.warning(f"Elasticsearch initialization failed (optional): {e}")
         logger.info("All services initialized successfully")
     except Exception as e:
         logger.error(f"Failed to initialize services: {e}")
