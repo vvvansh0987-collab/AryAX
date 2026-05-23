@@ -31,7 +31,3 @@ services:
       maxInstances: 3
       targetMemoryPercent: 80
       targetCPUPercent: 70
-    headers:
-      - path: /public/*
-        name: Cache-Control
-        value: public, max-age=86400
