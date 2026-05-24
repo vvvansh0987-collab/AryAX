@@ -1012,3 +1012,35 @@ body.light-theme .social-btn:hover{background:rgba(0,0,0,.06);}
     vertical-align: middle;
 }
 @keyframes blinkCursor { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* ── LUXURY UI ── */
+.welcome-hero.luxury-hero { text-align: center; margin-top: 10vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 1; }
+.cinematic-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; opacity: 0.8; }
+.luxury-content { z-index: 2; position: relative; display: flex; flex-direction: column; align-items: center; }
+.luxury-logo-wrap svg { margin-bottom: 24px; box-shadow: 0 0 40px rgba(255,255,255,0.1); border-radius: 22px; }
+.luxury-greeting { font-size: 42px; font-weight: 900; letter-spacing: 8px; margin: 0; color: #fff; text-transform: uppercase; background: linear-gradient(180deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.luxury-sub { font-size: 14px; font-weight: 600; letter-spacing: 10px; color: rgba(255,255,255,0.4); margin-top: 12px; text-transform: uppercase; }
+
+.luxury-input-zone { display: flex; flex-direction: column; align-items: center; padding: 20px 20px 40px 20px; position: sticky; bottom: 0; background: linear-gradient(0deg, #060608 60%, transparent 100%); z-index: 10; width: 100%; }
+.luxury-input-wrapper { width: 100%; max-width: 850px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; padding: 8px; backdrop-filter: blur(20px); transition: 0.3s; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+.luxury-input-wrapper:focus-within { border-color: rgba(255,255,255,0.2); box-shadow: 0 10px 50px rgba(255,255,255,0.05); }
+.luxury-input-inner { display: flex; align-items: center; gap: 8px; padding: 4px 8px; }
+
+.minimal-btn { background: transparent; border: none; color: #888; cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: 0.2s; outline: none; }
+.minimal-btn:hover { background: rgba(255,255,255,0.05); color: #fff; }
+
+.luxury-textarea { flex: 1; background: transparent; border: none; color: #fff; font-size: 16px; font-family: 'Outfit', sans-serif; resize: none; outline: none; padding: 12px 0; max-height: 200px; overflow-y: auto; line-height: 1.5; }
+.luxury-textarea::placeholder { color: rgba(255,255,255,0.2); font-weight: 300; }
+.luxury-textarea::-webkit-scrollbar { width: 0px; background: transparent; }
+
+.input-actions { display: flex; align-items: center; gap: 10px; }
+.send-pill { background: #fff; color: #000; border: none; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; outline: none; box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+.send-pill:hover { transform: scale(1.05); box-shadow: 0 0 30px rgba(255,255,255,0.4); }
+
+.luxury-shimmer-container { display: flex; justify-content: center; padding: 20px; }
+.luxury-shimmer-line { width: 150px; height: 2px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); animation: shimmer 1.5s infinite; border-radius: 2px; }
+@keyframes shimmer { 0% { background-position: -150px 0; } 100% { background-position: 150px 0; } }
+
+.file-preview-container { display: flex; align-items: center; gap: 10px; padding: 10px 15px; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 10px; margin-left: 8px; margin-right: 8px; }
+.file-name { font-size: 12px; color: #ccc; font-weight: 500; }
+.remove-file-btn { background: transparent; border: none; color: #ff5555; cursor: pointer; font-size: 18px; line-height: 1; outline: none; }
